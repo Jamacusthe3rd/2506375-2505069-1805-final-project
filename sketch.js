@@ -1,3 +1,4 @@
+let tileMap = []
 function setup() {
   createCanvas(500, 500);
 }
