@@ -4,6 +4,9 @@ let tilesX = 10
 let tilesY = 10
 let tileSize = 50
 let textures = []
+let player1 
+let leftOrRightLeg = true
+let leg = 1
 
 let graphicMap = [
 //    THESE ARE OUR Y VALUES
@@ -45,6 +48,7 @@ class Tile { //creates class for a tile
     this.xPos = this.tileX * this.tileSize; //x pixel position of tile in canvas
     this.yPos = this.tileY * this.tileSize; //y pixel position of tile in canvas
     this.tileID = tileID;
+    this.isMoving = false;
   }
 
   display() {
@@ -93,11 +97,83 @@ class Tile { //creates class for a tile
 
 }
 
+class Player {
+  constructor(currentSpriteGroup, startX, startY, tileRules){
+    this.currentSpriteGroup = currentSpriteGroup
+    this.currentSprite = this.currentSpriteGroup[0]
+    this.tileX = startX
+    this.tileY = startY
+    this.speed = 0.2
+    this.tileSize = tileSize
+    this.tileRules = tileRules
+
+  }
+
+  move() {
+    if ((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))){
+      this.isMoving = true
+    }
+    else{
+      this.isMoving = false
+    }
+    if (keyIsDown(87) == true){
+      this.currentSpriteGroup = sprites.knight_up
+      this.tileY -= this.speed
+    }
+    else{
+      if (keyIsDown(65) == true){
+      this.currentSpriteGroup = sprites.knight_left
+      this.tileX -= this.speed
+    }
+      else{
+        if (keyIsDown(83) == true){
+        this.currentSpriteGroup = sprites.knight_down
+        this.tileY += this.speed
+      }
+        else{
+          if (keyIsDown(68) == true){
+          this.currentSpriteGroup = sprites.knight_right
+          this.tileX += this.speed
+        }
+      }
+    }
+  }
+  if (this.isMoving){
+    setInterval(function () {leftOrRightLeg = !leftOrRightLeg}, 1000)
+    if (leftOrRightLeg){
+      leg = 1
+    }
+    else{
+      leg = 2
+    }
+    this.currentSprite = this.currentSpriteGroup[leg]
+  }
+  else{
+    this.currentSprite = this.currentSpriteGroup[0]
+  }
+}
+
+  display (){
+    //player sprite     //player x  //player y   //width   //height
+    image(this.currentSprite,this.tileX,this.tileY,tileSize,tileSize*2)
+  }
+
+}
+
 function preload() {
   textures[0] = loadImage('sprites/tile_grass.png')
   textures[1] = loadImage('sprites/tile_water.png')
   textures[2] = loadImage('sprites/tile_wood.png')
   textures[3] = loadImage('sprites/tile_stone.png')
+
+
+  sprites = {
+    knight_up: [loadImage('sprites/knight_up_still.png'),loadImage('sprites/knight_up_leftlegwalk.png'),loadImage('sprites/knight_up_rightlegwalk.png')],
+    knight_left: [loadImage('sprites/knight_left_still.png'),loadImage('sprites/knight_left_leftlegwalk.png'),loadImage('sprites/knight_left_rightlegwalk.png')],
+    knight_down: [loadImage('sprites/knight_down_still.png'),loadImage('sprites/knight_down_leftlegwalk.png'),loadImage('sprites/knight_down_rightlegwalk.png')],
+    knight_right: [loadImage('sprites/knight_right_still.png'),loadImage('sprites/knight_right_leftlegwalk.png'),loadImage('sprites/knight_right_rightlegwalk.png')],
+  }
+  
 }
 
 function setup() {
@@ -111,6 +187,7 @@ function setup() {
       tileID++
     }
   }
+  player1 = new Player(sprites.knight_down, 100, 100, tileRules)
 }
 
 function draw() {
@@ -121,6 +198,8 @@ function draw() {
       //tileMap[tileX][tileY].debugGrid() //displays the x and y of the tile in the tileMap scale (not default pixel scale), along with the tile ID
       
     }
+    player1.move()
+    player1.display()
   }
 
   //tileMap[5][6].displayMessage()//adding a message to specified tiles
