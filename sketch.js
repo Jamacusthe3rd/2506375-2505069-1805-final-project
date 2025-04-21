@@ -4,7 +4,7 @@ let tilesX = 32 // how many tiles there are horizontally that make up each level
 let tilesY = 16 // how many tiles there are vertically that make up each level screen
 let tileSize = 50 // height and width of each tile
 let textures = [] // creates array for the different tile textures/images to be loaded into
-let player1 
+let player1 // used as the instance of the Player class
 let counter = 0 // counter variable, used for anything that will happen after a certain number of loops/frames
 
 
@@ -15,54 +15,56 @@ let directionOfCollision = 4 // used to know what way the player cannot walk on 
 //                        ^^^
 // 4 is the state of no collision occouring
 
-// below ensures directionState and DirectionOfCollision can only be one of four directions at one time. 
+// ensures directionState and DirectionOfCollision can only be one of four directions at one time. 
 // vv
 let up = 0
 let left = 1
 let down = 2
 let right = 3
 
+let attackRange = 30
+
 let graphicMap = [
 //    THESE ARE OUR Y VALUES
 // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-	[0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
-	[0, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
-	[0, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
-	[0, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
-  [0, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
-  [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
-  [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
-  [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]  // 15
+	[1, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
+	[1, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
+	[1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+	[1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
+  [1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
+  [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+  [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+  [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
 ]
 
-let tileRules = [
-//    THESE ARE OUR Y VALUES
-// 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
-[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
-[0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
-[0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 3
-[0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 4
-[0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
-[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
-[0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
-[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]  // 15
-]
+// let tileRules = [
+// //    THESE ARE OUR Y VALUES
+// // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 3
+// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 4
+// [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+// [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]  // 15
+// ]
 
 
 class Tile { //creates class for a tile
@@ -81,6 +83,7 @@ class Tile { //creates class for a tile
     noStroke() // no boarder on the images of tiles drawn
     image(this.texture, this.xPos, this.yPos, tileSize, tileSize) //draws tile
   }
+
 
   debugGrid() { //used to display the x and y of the tiles in the tileMap scale (not default pixel scale), along with the tiles IDs
 
@@ -119,8 +122,6 @@ class Tile { //creates class for a tile
     textSize(10)
     text("Accessed!", this.xPos + xPadding, this.yPos + yPadding)
   }
-
-
 }
 
 // class TileRules { //creates class for a tile's rules (collision, level transition etc)
@@ -136,27 +137,27 @@ class Tile { //creates class for a tile
 // }
 
 class Player {
-  constructor(currentSpriteGroup, startX, startY, tileRules){
-    this.currentSpriteGroup = currentSpriteGroup //groups of sprites. Each group containing the still and walking sprites for a single direction of movement.
+  constructor(currentSpriteGroup, startX, startY){
+    this.currentSpriteGroup = currentSpriteGroup // groups of sprites. Each group containing the still and walking sprites for a single direction of movement.
     this.currentSprite = this.currentSpriteGroup[0] // start on 0 (standing still) in the group the player starts on
-    this.posX = startX
-    this.posY = startY
-    this.speed = 0.1
-    this.tileSize = tileSize
-    this.tileRules = tileRules
+    this.posX = startX // sets starting x position
+    this.posY = startY // sets starting y position
+    this.speed = 0.1 // player movement speed
+    this.tileSize = tileSize // sets tile size (50)
     this.isMoving = false // is player moving
     this.leg = 0  // 0 is state for no legs moving, for standing still/not walking
-    this.nextPosX = startX
-    this.nextPosY = startY
+    this.nextPosX = startX // keeps x value of where player is trying to move before actually moving them
+    this.nextPosY = startY // keeps y value of where player is trying to move before actually moving them
     this.collided = false // is collision occuring
+    this.attacking = false // is player attacking
   }
 
   move() {                                                               // and attacking is false
-    if ((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))){
-      this.isMoving = true
+    if ((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))){ // if player is moving
+      this.isMoving = true // set moving to true
     }
     else{
-      this.isMoving = false
+      this.isMoving = false // set moving to false
       this.leg = 0 // 0 is for standing still/not walking
       counter = 0 // for anything that must occur after a certain amount of time after a conditin is met (switching legs when walking condition is met)
     }
@@ -164,7 +165,7 @@ class Player {
     if (keyIsDown(87) == true){ //W UP
       directionState = up 
       this.currentSpriteGroup = sprites.knight_up
-      this.nextPosY = this.posY - this.speed
+      this.nextPosY = this.posY - this.speed 
     }
     else if (keyIsDown(65) == true){ //A LEFT
       directionState = left 
@@ -182,15 +183,15 @@ class Player {
       this.nextPosX = this.posX + this.speed
     }
     
-    for (let tileX = 0; tileX < tilesX; tileX++) {
-      for (let tileY = 0; tileY < tilesY; tileY++) {
+    for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
+      for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
 
-        if (tileRules[tileY][tileX] == 1){ // if tile is labelled to have collision
+        if (graphicMap[tileY][tileX] == 1){ // if tile is labelled to have collision
           collidableTiles += 1 // count of how many collidable tiles there are
-          if ((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it:
-            directionOfCollision = directionState
-            this.collided = true
-            //pushes player back a little when they collide with a tile. This was implemented to fix a bug that allowed the player to enter other collidable tiles if first colliding with another tile perpendicular to it.
+          if ((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it
+            directionOfCollision = directionState // (direction of the collided tile compared to the player). direction of collision is set to the direction the player is moving at the time the player collides with the tile
+            this.collided = true // collision is occuring
+            //pushes player back a little when they collide with a tile. This was implemented to fix a bug that allowed the player to enter other collidable tiles if first colliding with another tile perpendicular to it
             // vv
             if (directionState == up){
               this.nextPosY = this.posY + this.speed
@@ -205,34 +206,31 @@ class Player {
               this.nextPosX = this.posX - this.speed
             }
           }
-          if (!((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)))){ // if player is not close enough to tile to have collided with it:
-            collidableTiles_NotCollidedWith += 1 // count of how many collidable tiles there are that the player hasn't collided with
+          if (!((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)))){ // if player is not close enough to tile to have collided with it
+            collidableTiles_NotCollidedWith += 1 // add one to the count of how many collidable tiles there are that the player hasn't collided with
           }
         }
       }
     }
     if (collidableTiles_NotCollidedWith == collidableTiles){ // if none of the collidable tiles get collided with by the player:
-      this.collided = false //collision is not occuring
-      directionOfCollision = 4 //4 is the state of no collision occouring, allowing player to walk in all 4 directions
+      this.collided = false // collision is not occuring
+      directionOfCollision = 4 // 4 is the state of no collision occouring, allowing player to walk in all 4 directions
     }
-    collidableTiles = 0 //resets for next check
-    collidableTiles_NotCollidedWith = 0 //resets for next check
-    if (directionOfCollision != directionState){
-      if((keyIsDown(65))||(keyIsDown(68))){
-        this.posX = this.nextPosX
-      }
-      if((keyIsDown(87))||(keyIsDown(83))){
-        this.posY = this.nextPosY
+    collidableTiles = 0 // resets for next check
+    collidableTiles_NotCollidedWith = 0 // resets for next check
+    if (directionOfCollision != directionState){ // if attempting to walk in a direction that isn't the direction the collision occured 
+      if(((keyIsDown(65))||(keyIsDown(68))||(keyIsDown(87))||(keyIsDown(83))) && this.attacking == false){ // if walking key is pressed (wasd) , and attacking is not happening
+        this.posX = this.nextPosX // move in x direction
+        this.posY = this.nextPosY // move in y direction
       }
     }
-    
 
 
     if (this.isMoving == true){// if player is moving
       counter += 1 // n increments every loop
       if (this.leg == 0){ //if walking has just started:
         this.leg = 1  // start walking with left leg up
-      }
+      }//       n vv
       else if (counter == 600){ //swaps legs every n loops, while isMoving stays true
         counter = 0 //starts n at 0
         if (this.leg == 1){
@@ -249,15 +247,32 @@ class Player {
   }
 
   
-  // attack (){
-  //   if (keyIsPressed(32)){
+  attack (){
+    if (keyIsDown(32)){
+      this.attacking = true
 
-  //   }
-  // }
+      if (directionState == up){
+        image(sprites.sword[directionState],this.posX,this.posY - (20) - attackRange,tileSize/2,tileSize)
+      }
+      if (directionState == left){
+        image(sprites.sword[directionState],this.posX - attackRange,this.posY - (20),tileSize,tileSize/2)
+      }
+      if (directionState == down){
+        image(sprites.sword[directionState],this.posX,this.posY - (20) + attackRange,tileSize/2,tileSize)
+      }
+      if (directionState == right){
+        image(sprites.sword[directionState],this.posX + attackRange,this.posY - (20),tileSize,tileSize/2)
+      }
+      
+    }
+    else {
+      this.attacking = false
+    }
+  }
 
   display (){                  //(so players legs appear where collison with tiles is)
-    //player sprite          //player x //player y       ^      //width   //height
-    image(this.currentSprite,this.posX,this.posY - (20),tileSize/2,tileSize)
+    //player sprite          //player x //player y   ^   //width   //height
+    image(this.currentSprite,this.posX,this.posY - (20),tileSize/2,tileSize) //draws player sprite
   }
 
 }
@@ -269,11 +284,15 @@ function preload() { //tiles
   textures[3] = loadImage('sprites/tile_stone.png')
 
 
-  sprites = { //groups of sprites. Each group containing the still and walking sprites for a single direction of movement.
+  sprites = { //groups of sprites. 
+  // Each group here containing the still and walking sprites for a single direction of movement.
     knight_up: [loadImage('sprites/knight_up_still.png'),loadImage('sprites/knight_up_leftlegwalk.png'),loadImage('sprites/knight_up_rightlegwalk.png')],
     knight_left: [loadImage('sprites/knight_left_still.png'),loadImage('sprites/knight_left_leftlegwalk.png'),loadImage('sprites/knight_left_rightlegwalk.png')],
     knight_down: [loadImage('sprites/knight_down_still.png'),loadImage('sprites/knight_down_leftlegwalk.png'),loadImage('sprites/knight_down_rightlegwalk.png')],
     knight_right: [loadImage('sprites/knight_right_still.png'),loadImage('sprites/knight_right_leftlegwalk.png'),loadImage('sprites/knight_right_rightlegwalk.png')],
+
+    // group of sprites. Each group containing the sword for a single direction of movement.
+    sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')]
   }
   
 }
@@ -282,26 +301,28 @@ function setup() {
   createCanvas(1600,800);
   imageMode(CENTER)
   let tileID = 0 //identification of each individual tile, starting at 0
-  for (let tileX = 0; tileX < tilesX; tileX++) {
+  for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile creation for how many tiles there are supposed to be horizontally in the tile map
     tileMap[tileX] = []
-    for (let tileY = 0; tileY < tilesY; tileY++) {
+    for (let tileY = 0; tileY < tilesY; tileY++) {// loops the tile creation for how many tiles there are supposed to be vertically in the tile map
       let texture = graphicMap[tileY][tileX]
       tileMap[tileX][tileY] = new Tile(textures[texture], tileX, tileY, tileSize, tileID) //creates a tile object for every 50 pixels down and every 50 pixels right
       tileID++ //identification of each individual tile, incrementing for each tile created
     }
   }
-  player1 = new Player(sprites.knight_down, 100, 300, tileRules)
+  player1 = new Player(sprites.knight_down, 100, 300) // instance of Player class
 }
 
 function draw() {
-  background(0);
-  for (let tileX = 0; tileX < tilesX; tileX++) {
-    for (let tileY = 0; tileY < tilesY; tileY++) {
-      tileMap[tileX][tileY].display()
+  background(0) // 
+  for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile display for how many tiles there are horizontally
+    for (let tileY = 0; tileY < tilesY; tileY++) { // loops the tile display for how many tiles there are vertically
+      tileMap[tileX][tileY].display() // display tile
       //tileMap[tileX][tileY].debugGrid() //displays the x and y of the tile in the tileMap scale (not default pixel scale), along with the tile ID
       
     }
+    
     player1.move()
+    player1.attack()
     player1.display()
   }
 
