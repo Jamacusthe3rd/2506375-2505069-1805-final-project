@@ -3,11 +3,14 @@ let tileMap = [] // creates array for the instances of the Tile class to be adde
 let tilesX = 32 // how many tiles there are horizontally that make up each level screen
 let tilesY = 16 // how many tiles there are vertically that make up each level screen
 let tileSize = 50 // height and width of each tile
+let hudSize = 100 // height of top bar on screen, showing player health
 let textures = [] // creates array for the different tile textures/images to be loaded into
 let player1 // used as the instance of the Player class
 let counter = 0 // counter variable, used for anything that will happen after a certain number of loops/frames
+let counter1 = 0 
 
-
+let collidableTiles_list = [1,3] // list of tile types that are collidable for the player and enemies
+let tileIsCollidable = false
 let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with
 let collidableTiles = 0 // count of how many collidable tiles there are
 let directionState = 0 //used for working out things like direction of collision
@@ -22,7 +25,7 @@ let left = 1
 let down = 2
 let right = 3
 
-let attackRange = 30
+let attackRange = 25
 
 let graphicMap = [
 //    THESE ARE OUR Y VALUES
@@ -36,12 +39,12 @@ let graphicMap = [
   [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
   [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
+  [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+  [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+  [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+  [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
+  [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
 ]
 
@@ -74,7 +77,7 @@ class Tile { //creates class for a tile
     this.tileY = tileY; //y position of tile in tileMap grid
     this.tileSize = tileSize; //size of tiles in pixels
     this.xPos = (this.tileX * this.tileSize) + (this.tileSize/2); //x pixel position of tile in canvas
-    this.yPos = (this.tileY * this.tileSize) + (this.tileSize/2); //y pixel position of tile in canvas
+    this.yPos = (this.tileY * this.tileSize) + (this.tileSize/2) + hudSize; //y pixel position of tile in canvas
     this.tileID = tileID; //identification of each individual tile
   }
 
@@ -142,18 +145,21 @@ class Player {
     this.currentSprite = this.currentSpriteGroup[0] // start on 0 (standing still) in the group the player starts on
     this.posX = startX // sets starting x position
     this.posY = startY // sets starting y position
-    this.speed = 0.1 // player movement speed
-    this.tileSize = tileSize // sets tile size (50)
+    this.speed = 0.08 // player movement speed
+    this.hitboxSize = 40 // slightly smaller than tile size so player can fit between two with a 1 tile wide gap without difficulty
+    this.maxHealth = 100
+    this.currentHealth = this.maxHealth
     this.isMoving = false // is player moving
     this.leg = 0  // 0 is state for no legs moving, for standing still/not walking
     this.nextPosX = startX // keeps x value of where player is trying to move before actually moving them
     this.nextPosY = startY // keeps y value of where player is trying to move before actually moving them
     this.collided = false // is collision occuring
     this.attacking = false // is player attacking
+    this.damagedRecently = false 
   }
 
-  move() {                                                               // and attacking is false
-    if ((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))){ // if player is moving
+  move() {                                                               
+    if (((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))) && this.attacking == false){ // if player is moving and attacking is false
       this.isMoving = true // set moving to true
     }
     else{
@@ -185,10 +191,16 @@ class Player {
     
     for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
       for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
-
-        if (graphicMap[tileY][tileX] == 1){ // if tile is labelled to have collision
+        
+        tileIsCollidable = false // variable set to false by default before checking the next tile
+        for (let i = 0; i < collidableTiles_list.length; i++){ // goes through the values in the collidableTiles_list array 
+          if (graphicMap[tileY][tileX] == collidableTiles_list[i]){ // checks if this tile is one of the tile types in the collidableTiles_list array
+            tileIsCollidable = true // variable set to true if value for tile is in the collidableTiles_list array
+          }
+        }
+        if (tileIsCollidable == true){ // if tile is labelled to have collision
           collidableTiles += 1 // count of how many collidable tiles there are
-          if ((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it
+          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it (and a collision has not yet occured with another tile)
             directionOfCollision = directionState // (direction of the collided tile compared to the player). direction of collision is set to the direction the player is moving at the time the player collides with the tile
             this.collided = true // collision is occuring
             //pushes player back a little when they collide with a tile. This was implemented to fix a bug that allowed the player to enter other collidable tiles if first colliding with another tile perpendicular to it
@@ -206,7 +218,7 @@ class Player {
               this.nextPosX = this.posX - this.speed
             }
           }
-          if (!((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize && this.nextPosY <= tileY*tileSize + (tileSize)))){ // if player is not close enough to tile to have collided with it
+          if (!((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize) + (hudSize)))){ // if player is not close enough to tile to have collided with it
             collidableTiles_NotCollidedWith += 1 // add one to the count of how many collidable tiles there are that the player hasn't collided with
           }
         }
@@ -214,7 +226,7 @@ class Player {
     }
     if (collidableTiles_NotCollidedWith == collidableTiles){ // if none of the collidable tiles get collided with by the player:
       this.collided = false // collision is not occuring
-      directionOfCollision = 4 // 4 is the state of no collision occouring, allowing player to walk in all 4 directions
+      directionOfCollision = 4 // 4 is the state of no collision occouring in any direction, allowing player to walk in all 4 directions
     }
     collidableTiles = 0 // resets for next check
     collidableTiles_NotCollidedWith = 0 // resets for next check
@@ -246,22 +258,21 @@ class Player {
     this.currentSprite = this.currentSpriteGroup[this.leg] //updates current player sprite, depending on direction looking, and if moving or stationary
   }
 
-  
   attack (){
     if (keyIsDown(32)){
       this.attacking = true
 
       if (directionState == up){
-        image(sprites.sword[directionState],this.posX,this.posY - (20) - attackRange,tileSize/2,tileSize)
+        image(sprites.sword[directionState],this.posX,this.posY - attackRange,tileSize/2,tileSize)
       }
       if (directionState == left){
-        image(sprites.sword[directionState],this.posX - attackRange,this.posY - (20),tileSize,tileSize/2)
+        image(sprites.sword[directionState],this.posX - attackRange,this.posY,tileSize,tileSize/2)
       }
       if (directionState == down){
-        image(sprites.sword[directionState],this.posX,this.posY - (20) + attackRange,tileSize/2,tileSize)
+        image(sprites.sword[directionState],this.posX,this.posY + attackRange,tileSize/2,tileSize)
       }
       if (directionState == right){
-        image(sprites.sword[directionState],this.posX + attackRange,this.posY - (20),tileSize,tileSize/2)
+        image(sprites.sword[directionState],this.posX + attackRange,this.posY,tileSize,tileSize/2)
       }
       
     }
@@ -270,9 +281,37 @@ class Player {
     }
   }
 
-  display (){                  //(so players legs appear where collison with tiles is)
-    //player sprite          //player x //player y   ^   //width   //height
-    image(this.currentSprite,this.posX,this.posY - (20),tileSize/2,tileSize) //draws player sprite
+  healthbar (){
+
+    //healthbar outline
+    noFill()
+    stroke(0)//player x - half player width //player y - slightly more than half player height //bar length //bar thickness
+    rect(20,50,100,20) // healthbar outline
+    fill(200,0,0)
+    noStroke()
+    textSize(30)//scales text size
+    text(this.currentHealth,20,45)//text display of health
+    rect(20,50,100/(this.maxHealth/this.currentHealth),20) // healthbar (decreasing part when player is damaged)
+  }            //bar length                        //bar thickness
+
+  damageCheck() {
+    // player is hit    and   player has not been hit too recently (invincibility frames gone)
+    if ((mouseIsPressed) && (this.damagedRecently == false)){ 
+      this.currentHealth += -25 // take damage
+      this.damagedRecently = true
+    }
+    if (this.damagedRecently == true){
+      counter1 += 1
+    }
+    if (counter1 == 3000){ // n is time being invincible after being hit
+      this.damagedRecently = false
+      counter1 = 0
+    }
+  }
+
+  display (){
+    //player sprite          //player x //player y  //width   //height
+    image(this.currentSprite,this.posX,this.posY,tileSize,tileSize) //draws player sprite
   }
 
 }
@@ -291,14 +330,14 @@ function preload() { //tiles
     knight_down: [loadImage('sprites/knight_down_still.png'),loadImage('sprites/knight_down_leftlegwalk.png'),loadImage('sprites/knight_down_rightlegwalk.png')],
     knight_right: [loadImage('sprites/knight_right_still.png'),loadImage('sprites/knight_right_leftlegwalk.png'),loadImage('sprites/knight_right_rightlegwalk.png')],
 
-    // group of sprites. Each group containing the sword for a single direction of movement.
+    // group of sprites. Each group containing the sword sprite for a single direction of movement.
     sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')]
   }
   
 }
 
 function setup() {
-  createCanvas(1600,800);
+  createCanvas(1600,800 + hudSize);
   imageMode(CENTER)
   let tileID = 0 //identification of each individual tile, starting at 0
   for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile creation for how many tiles there are supposed to be horizontally in the tile map
@@ -313,7 +352,7 @@ function setup() {
 }
 
 function draw() {
-  background(0) // 
+  background(100) // 
   for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile display for how many tiles there are horizontally
     for (let tileY = 0; tileY < tilesY; tileY++) { // loops the tile display for how many tiles there are vertically
       tileMap[tileX][tileY].display() // display tile
@@ -324,6 +363,8 @@ function draw() {
     player1.move()
     player1.attack()
     player1.display()
+    player1.healthbar()
+    player1.damageCheck()
   }
 
   //tileMap[5][6].displayMessage()//adding a message to specified tiles
