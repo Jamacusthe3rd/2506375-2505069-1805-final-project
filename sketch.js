@@ -6,10 +6,16 @@ let tileSize = 50 // height and width of each tile
 let hudSize = 100 // height of top bar on screen, showing player health
 let textures = [] // creates array for the different tile textures/images to be loaded into
 let player1 // used as the instance of the Player class
-let counter = 0 // counter variable, used for anything that will happen after a certain number of loops/frames
-let counter1 = 0 
+
+// counter variables, used for anything that will happen after a certain number of loops/frames
+let counter = 0 // used for the delay between swapping walking sprites while player is moving
+let counter1 = 0 // used for a time of invincibility after the player is hit
+let counter2 = 0
 
 let collidableTiles_list = [1,3] // list of tile types that are collidable for the player and enemies
+//  ^^
+//This allows us to contiue using tileMap only, not needing to make and edit a whole separate map for "tileRules" for each map/level. We can just stick with the singular map acting as rules and graphics.
+// (Still very easy to change to graphics and rules separately if need be.)
 let tileIsCollidable = false
 let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with
 let collidableTiles = 0 // count of how many collidable tiles there are
@@ -30,21 +36,21 @@ let attackRange = 25
 let graphicMap = [
 //    THESE ARE OUR Y VALUES
 // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-	[1, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
-	[1, 0, 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
-	[1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
-	[1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
-  [1, 0, 0, 0, 0, 0, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
-  [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
-  [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
-  [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-  [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-  [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-  [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-  [1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
-  [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
+	[1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
+	[1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
+	[1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+	[1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
+  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 12
+  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 13
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 14
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
 ]
 
@@ -84,7 +90,7 @@ class Tile { //creates class for a tile
 
   display() {
     noStroke() // no boarder on the images of tiles drawn
-    image(this.texture, this.xPos, this.yPos, tileSize, tileSize) //draws tile
+    image(this.texture, this.xPos, this.yPos, tileSize, tileSize) //draws tile 
   }
 
 
@@ -143,8 +149,10 @@ class Player {
   constructor(currentSpriteGroup, startX, startY){
     this.currentSpriteGroup = currentSpriteGroup // groups of sprites. Each group containing the still and walking sprites for a single direction of movement.
     this.currentSprite = this.currentSpriteGroup[0] // start on 0 (standing still) in the group the player starts on
-    this.posX = startX // sets starting x position
-    this.posY = startY // sets starting y position
+    this.startX = startX // x value for starting position. used for respawning 
+    this.startY = startY // y value for starting position. used for respawning 
+    this.posX = this.startX // sets starting x position when you first load the game
+    this.posY = this.startY // sets starting y position when you first load the game
     this.speed = 0.08 // player movement speed
     this.hitboxSize = 40 // slightly smaller than tile size so player can fit between two with a 1 tile wide gap without difficulty
     this.maxHealth = 100
@@ -155,7 +163,8 @@ class Player {
     this.nextPosY = startY // keeps y value of where player is trying to move before actually moving them
     this.collided = false // is collision occuring
     this.attacking = false // is player attacking
-    this.damagedRecently = false 
+    this.damagedRecently = false // has player been recently damaged
+    this.alive = true
   }
 
   move() {                                                               
@@ -281,36 +290,64 @@ class Player {
     }
   }
 
-  healthbar (){
-
+  hud(){
+    if (this.alive == true){
+      fill(50,100,50)
+      rect(0,0,1600,hudSize)
+    }
+    this.healthbar()
+  }
+  
+  healthbar(){
     //healthbar outline
     noFill()
-    stroke(0)//player x - half player width //player y - slightly more than half player height //bar length //bar thickness
-    rect(20,50,100,20) // healthbar outline
+    stroke(0)
+    rect(20,50,this.maxHealth,20) // healthbar outline
     fill(200,0,0)
     noStroke()
     textSize(30)//scales text size
     text(this.currentHealth,20,45)//text display of health
-    rect(20,50,100/(this.maxHealth/this.currentHealth),20) // healthbar (decreasing part when player is damaged)
+    rect(20,50,this.maxHealth/(this.maxHealth/this.currentHealth),20) // healthbar (decreasing part when player is damaged)
   }            //bar length                        //bar thickness
 
   damageCheck() {
     // player is hit    and   player has not been hit too recently (invincibility frames gone)
-    if ((mouseIsPressed) && (this.damagedRecently == false)){ 
-      this.currentHealth += -25 // take damage
-      this.damagedRecently = true
+    if ((mouseIsPressed) && (this.damagedRecently == false)){ // if [player is hit by enemy] and player has not been recently damaged
+      this.currentHealth += -25 // take damage // n will be the damage an enemy does
+      this.damagedRecently = true // player has been recently damaged
     }
-    if (this.damagedRecently == true){
-      counter1 += 1
+    if (this.damagedRecently == true){ // if player has been recently damaged
+      counter1 += 1 // count increments
     }
     if (counter1 == 3000){ // n is time being invincible after being hit
-      this.damagedRecently = false
-      counter1 = 0
+      this.damagedRecently = false // player no longer recently damaged (able to be damaged again)
+      counter1 = 0 // reset invincibility counter
+    }
+
+    if (this.currentHealth <= 0){ // if player dies
+      this.alive = false
+      if (counter2 >= 300){ // once screen is 100% black // 255 is the max for alpha but a slight delay staying on the black screen as the counter continues to go to the higher number before respawning looks nice
+        this.posX = this.startX // sets x position to the starting spawn
+        this.posY = this.startY // sets y position to the starting spawn
+        this.nextPosX = this.startX
+        this.nextPosY = this.startY
+        this.currentHealth = this.maxHealth // sets current health to max
+        this.alive = true
+        counter2 = 0
+      }
+    }
+  }
+
+  deathScreen(){
+    if (this.alive == false){
+      fill(0,0,0,counter2)
+      rect(0,hudSize,1600,800)
+      counter2 += 0.05
     }
   }
 
   display (){
-    //player sprite          //player x //player y  //width   //height
+    //player sprite          //player x //player y  //width  //height
     image(this.currentSprite,this.posX,this.posY,tileSize,tileSize) //draws player sprite
   }
 
@@ -339,6 +376,7 @@ function preload() { //tiles
 function setup() {
   createCanvas(1600,800 + hudSize);
   imageMode(CENTER)
+  rectMode(CORNER)
   let tileID = 0 //identification of each individual tile, starting at 0
   for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile creation for how many tiles there are supposed to be horizontally in the tile map
     tileMap[tileX] = []
@@ -348,7 +386,7 @@ function setup() {
       tileID++ //identification of each individual tile, incrementing for each tile created
     }
   }
-  player1 = new Player(sprites.knight_down, 100, 300) // instance of Player class
+  player1 = new Player(sprites.knight_down, (25*tileSize) + tileSize/2 , (13*tileSize) + tileSize/2) // instance of Player class
 }
 
 function draw() {
@@ -357,14 +395,14 @@ function draw() {
     for (let tileY = 0; tileY < tilesY; tileY++) { // loops the tile display for how many tiles there are vertically
       tileMap[tileX][tileY].display() // display tile
       //tileMap[tileX][tileY].debugGrid() //displays the x and y of the tile in the tileMap scale (not default pixel scale), along with the tile ID
-      
     }
     
     player1.move()
     player1.attack()
     player1.display()
-    player1.healthbar()
+    player1.hud()
     player1.damageCheck()
+    player1.deathScreen()
   }
 
   //tileMap[5][6].displayMessage()//adding a message to specified tiles
