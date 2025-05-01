@@ -6,25 +6,21 @@ let tileSize = 50 // height and width of each tile
 let hudSize = 100 // height of top bar on screen, showing player health
 let textures = [] // creates array for the different tile textures/images to be loaded into
 let player1 // used as the instance of the Player class
+let spawnTileX = 26
+let spawnTileY = 10
 
 // counter variables, used for anything that will happen after a certain number of loops/frames
 let counter = 0 // used for the delay between swapping walking sprites while player is moving
 let counter1 = 0 // used for a time of invincibility after the player is hit
-let counter2 = 0
+let counter2 = 0 // used  for the alpha value for the blackness of the screen increasing when the player dies
 
-let collidableTiles_list = [1,3] // list of tile types that are collidable for the player and enemies
-//  ^^
-//This allows us to contiue using tileMap only, not needing to make and edit a whole separate map for "tileRules" for each map/level. We can just stick with the singular map acting as rules and graphics.
-// (Still very easy to change to graphics and rules separately if need be.)
+
 let tileIsCollidable = false
 let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with
 let collidableTiles = 0 // count of how many collidable tiles there are
-let directionState = 0 //used for working out things like direction of collision
-let directionOfCollision = 4 // used to know what way the player cannot walk on collisons 
-//                        ^^^
-// 4 is the state of no collision occouring
 
-// ensures directionState and DirectionOfCollision can only be one of four directions at one time. 
+
+// ensures this.directionState and this.DirectionOfCollision can only be one of four directions at one time. 
 // vv
 let up = 0
 let left = 1
@@ -33,47 +29,158 @@ let right = 3
 
 let attackRange = 25
 
-let graphicMap = [
-//    THESE ARE OUR Y VALUES
-// 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-	[1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
-	[1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
-	[1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
-	[1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-  [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 12
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 13
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 14
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
-]
 
-// let tileRules = [
-// //    THESE ARE OUR Y VALUES
-// // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
-// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
-// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
-// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 3
-// [0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 4
-// [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
-// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
-// [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
-// [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 12
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 13
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 14
-// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]  // 15
-// ]
+
+let level0 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1,13, 1, 1, 1, 1, 1, 1, 1,11,11,11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+    ],
+
+    startTileX : spawnTileX,
+    startTileY : spawnTileY
+}
+
+let level1 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,10,10,10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  startTileX : 16,
+  startTileY : 14
+}
+
+let level2 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1,12, 1, 1, 1, 1, 1, 1, 1,10,10,10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  startTileX : 7,
+  startTileY : 14
+}
+
+
+// level control variables
+let levels = [level0, level1, level2]
+let currentLevel = 0
+let graphicMap
+let tileRules
 
 
 class Tile { //creates class for a tile
@@ -153,10 +260,12 @@ class Player {
     this.startY = startY // y value for starting position. used for respawning 
     this.posX = this.startX // sets starting x position when you first load the game
     this.posY = this.startY // sets starting y position when you first load the game
+    this.directionState = 0 //used for working out things like direction of collision
+    this.directionOfCollision = 4 // used to know what way the player cannot walk on collisons (4 is the state of no collision occouring)
     this.speed = 0.08 // player movement speed
     this.hitboxSize = 40 // slightly smaller than tile size so player can fit between two with a 1 tile wide gap without difficulty
-    this.maxHealth = 100
-    this.currentHealth = this.maxHealth
+    this.maxHealth = 100 // player's maximum health at astart of gameplay 
+    this.currentHealth = this.maxHealth // starts on max health
     this.isMoving = false // is player moving
     this.leg = 0  // 0 is state for no legs moving, for standing still/not walking
     this.nextPosX = startX // keeps x value of where player is trying to move before actually moving them
@@ -168,7 +277,7 @@ class Player {
   }
 
   move() {                                                               
-    if (((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))) && this.attacking == false){ // if player is moving and attacking is false
+    if (((keyIsDown(87))||(keyIsDown(65))||(keyIsDown(83))||(keyIsDown(68))) && (this.attacking == false) && (this.alive == true)){ // if player is moving and attacking is false
       this.isMoving = true // set moving to true
     }
     else{
@@ -176,54 +285,98 @@ class Player {
       this.leg = 0 // 0 is for standing still/not walking
       counter = 0 // for anything that must occur after a certain amount of time after a conditin is met (switching legs when walking condition is met)
     }
-    
-    if (keyIsDown(87) == true){ //W UP
-      directionState = up 
-      this.currentSpriteGroup = sprites.knight_up
-      this.nextPosY = this.posY - this.speed 
+    if (this.isMoving == true){
+      if (keyIsDown(87) == true){ //W UP
+        this.directionState = up 
+        this.currentSpriteGroup = sprites.knight_up
+        this.nextPosY = this.posY - this.speed 
+      }
+      else if (keyIsDown(65) == true){ //A LEFT
+        this.directionState = left 
+        this.currentSpriteGroup = sprites.knight_left
+        this.nextPosX = this.posX - this.speed
+      }
+      else if (keyIsDown(83) == true){ //S DOWN
+        this.directionState = down
+        this.currentSpriteGroup = sprites.knight_down
+        this.nextPosY = this.posY + this.speed
+      }
+      else if (keyIsDown(68) == true){ //D RIGHT
+        this.directionState = right
+        this.currentSpriteGroup = sprites.knight_right
+        this.nextPosX = this.posX + this.speed
+      }
     }
-    else if (keyIsDown(65) == true){ //A LEFT
-      directionState = left 
-      this.currentSpriteGroup = sprites.knight_left
-      this.nextPosX = this.posX - this.speed
-    }
-    else if (keyIsDown(83) == true){ //S DOWN
-      directionState = down
-      this.currentSpriteGroup = sprites.knight_down
-      this.nextPosY = this.posY + this.speed
-    }
-    else if (keyIsDown(68) == true){ //D RIGHT
-      directionState = right
-      this.currentSpriteGroup = sprites.knight_right
-      this.nextPosX = this.posX + this.speed
-    }
+
     
     for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
       for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
         
-        tileIsCollidable = false // variable set to false by default before checking the next tile
-        for (let i = 0; i < collidableTiles_list.length; i++){ // goes through the values in the collidableTiles_list array 
-          if (graphicMap[tileY][tileX] == collidableTiles_list[i]){ // checks if this tile is one of the tile types in the collidableTiles_list array
-            tileIsCollidable = true // variable set to true if value for tile is in the collidableTiles_list array
+//Checking for level change tiles vv
+
+        if (tileRules[tileY][tileX] == 11){ // checks if this tile is a level changer 
+          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+            levels[1].startTileX = 16
+            levels[1].startTileY = 14
+            currentLevel = 1
+            loadLevel()
           }
         }
+
+        if (tileRules[tileY][tileX] == 10){ // checks if this tile is a level changer 
+          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+            //where the player will spawn if entering level0 from a 10 tile rule
+            levels[0].startTileX = 16
+            levels[0].startTileY = 1
+            currentLevel = 0
+            loadLevel()
+          }
+        }
+
+        if (tileRules[tileY][tileX] == 12){ // checks if this tile is a level changer 
+          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+            //where the player will spawn if entering level0 from a 12 tile rule
+            levels[0].startTileX = 7
+            levels[0].startTileY = 1
+            currentLevel = 0
+            loadLevel()
+          }
+        }
+
+        if (tileRules[tileY][tileX] == 13){ // checks if this tile is a level changer 
+          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+            //where the player will spawn if entering level2 from a 13 tile rule
+            levels[2].startTileX = 7
+            levels[2].startTileY = 14
+            currentLevel = 2
+            loadLevel()
+          }
+        }
+
+//checking tile collision vv
+
+        tileIsCollidable = false // variable set to false by default before checking the next tile
+        if (tileRules[tileY][tileX] == 1){ // checks if this tile is collidable
+          tileIsCollidable = true // variable set to true if value for tile is collidable
+        }
+        
         if (tileIsCollidable == true){ // if tile is labelled to have collision
           collidableTiles += 1 // count of how many collidable tiles there are
           if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it (and a collision has not yet occured with another tile)
-            directionOfCollision = directionState // (direction of the collided tile compared to the player). direction of collision is set to the direction the player is moving at the time the player collides with the tile
+            this.directionOfCollision = this.directionState // (direction of the collided tile compared to the player). direction of collision is set to the direction the player is moving at the time the player collides with the tile
             this.collided = true // collision is occuring
             //pushes player back a little when they collide with a tile. This was implemented to fix a bug that allowed the player to enter other collidable tiles if first colliding with another tile perpendicular to it
             // vv
-            if (directionState == up){
+            if (this.directionState == up){
               this.nextPosY = this.posY + this.speed
             }
-            if (directionState == left){
+            if (this.directionState == left){
               this.nextPosX = this.posX + this.speed
             }
-            if (directionState == down){
+            if (this.directionState == down){
               this.nextPosY = this.posY - this.speed
             }
-            if (directionState == right){
+            if (this.directionState == right){
               this.nextPosX = this.posX - this.speed
             }
           }
@@ -235,12 +388,12 @@ class Player {
     }
     if (collidableTiles_NotCollidedWith == collidableTiles){ // if none of the collidable tiles get collided with by the player:
       this.collided = false // collision is not occuring
-      directionOfCollision = 4 // 4 is the state of no collision occouring in any direction, allowing player to walk in all 4 directions
+      this.directionOfCollision = 4 // 4 is the state of no collision occouring in any direction, allowing player to walk in all 4 directions
     }
     collidableTiles = 0 // resets for next check
     collidableTiles_NotCollidedWith = 0 // resets for next check
-    if (directionOfCollision != directionState){ // if attempting to walk in a direction that isn't the direction the collision occured 
-      if(((keyIsDown(65))||(keyIsDown(68))||(keyIsDown(87))||(keyIsDown(83))) && this.attacking == false){ // if walking key is pressed (wasd) , and attacking is not happening
+    if (this.directionOfCollision != this.directionState){ // if attempting to walk in a direction that isn't the direction the collision occured 
+      if(((keyIsDown(65))||(keyIsDown(68))||(keyIsDown(87))||(keyIsDown(83))) && (this.attacking == false)){ // if walking key is pressed (wasd) , and attacking is not happening
         this.posX = this.nextPosX // move in x direction
         this.posY = this.nextPosY // move in y direction
       }
@@ -271,19 +424,32 @@ class Player {
     if (keyIsDown(32)){
       this.attacking = true
 
-      if (directionState == up){
-        image(sprites.sword[directionState],this.posX,this.posY - attackRange,tileSize/2,tileSize)
+      if (this.directionState == up){
+        image(sprites.sword[this.directionState],this.posX,this.posY - attackRange,tileSize/2,tileSize)
+
+        //playerWeaponHitbox = (!(enemyX - (enemySize/2) >= this.posX + (this.hitboxSize/2) && enemyX + (enemySize/2) <= this.posX - (this.hitboxSize/2) && enemyY + (enemySize/2) <= this.posY - (this.hitboxSize + (this.hitboxSize/2)) && enemyY - (enemySize/2) >= this.posY + (-this.hitboxSize + (this.hitboxSize/2))))
       }
-      if (directionState == left){
-        image(sprites.sword[directionState],this.posX - attackRange,this.posY,tileSize,tileSize/2)
+      if (this.directionState == left){
+        image(sprites.sword[this.directionState],this.posX - attackRange,this.posY,tileSize,tileSize/2)
+
+        //
       }
-      if (directionState == down){
-        image(sprites.sword[directionState],this.posX,this.posY + attackRange,tileSize/2,tileSize)
+      if (this.directionState == down){
+        image(sprites.sword[this.directionState],this.posX,this.posY + attackRange,tileSize/2,tileSize)
+
+        //
       }
-      if (directionState == right){
-        image(sprites.sword[directionState],this.posX + attackRange,this.posY,tileSize,tileSize/2)
+      if (this.directionState == right){
+        image(sprites.sword[this.directionState],this.posX + attackRange,this.posY,tileSize,tileSize/2)
+
+        //
       }
       
+      //for (number of enemies in enemy list){
+        //if ((enemy 1,2, etc) is within "playerWeaponHitbox"){
+          //enemyCurrentHealth += - playerWeaponDamage
+        //}
+      //}
     }
     else {
       this.attacking = false
@@ -327,12 +493,15 @@ class Player {
     if (this.currentHealth <= 0){ // if player dies
       this.alive = false
       if (counter2 >= 300){ // once screen is 100% black // 255 is the max for alpha but a slight delay staying on the black screen as the counter continues to go to the higher number before respawning looks nice
-        this.posX = this.startX // sets x position to the starting spawn
-        this.posY = this.startY // sets y position to the starting spawn
-        this.nextPosX = this.startX
-        this.nextPosY = this.startY
         this.currentHealth = this.maxHealth // sets current health to max
+        this.directionState = down
+        this.currentSpriteGroup = sprites.knight_down
         this.alive = true
+        currentLevel = 0
+        levels[currentLevel].startTileX = 26
+        levels[currentLevel].startTileY = 10
+        loadLevel()
+
         counter2 = 0
       }
     }
@@ -377,16 +546,32 @@ function setup() {
   createCanvas(1600,800 + hudSize);
   imageMode(CENTER)
   rectMode(CORNER)
+
+
+  player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize) // instance of Player class
+  
+  loadLevel()
+}
+
+function loadLevel() {
+
+  graphicMap = levels[currentLevel].graphicMap
+  tileRules = levels[currentLevel].tileRules
+
+  player1.posX = ((levels[currentLevel].startTileX) * tileSize) + tileSize/2
+  player1.posY = ((levels[currentLevel].startTileY) * tileSize) + hudSize + tileSize/2
+  player1.nextPosX = player1.posX
+  player1.nextPosY = player1.posY
+
   let tileID = 0 //identification of each individual tile, starting at 0
   for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile creation for how many tiles there are supposed to be horizontally in the tile map
     tileMap[tileX] = []
-    for (let tileY = 0; tileY < tilesY; tileY++) {// loops the tile creation for how many tiles there are supposed to be vertically in the tile map
+    for (let tileY = 0; tileY < tilesY; tileY++) { // loops the tile creation for how many tiles there are supposed to be vertically in the tile map
       let texture = graphicMap[tileY][tileX]
       tileMap[tileX][tileY] = new Tile(textures[texture], tileX, tileY, tileSize, tileID) //creates a tile object for every 50 pixels down and every 50 pixels right
-      tileID++ //identification of each individual tile, incrementing for each tile created
+      tileID++
     }
   }
-  player1 = new Player(sprites.knight_down, (25*tileSize) + tileSize/2 , (13*tileSize) + tileSize/2) // instance of Player class
 }
 
 function draw() {
