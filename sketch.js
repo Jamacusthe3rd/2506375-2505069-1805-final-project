@@ -8,6 +8,7 @@ let textures = [] // creates array for the different tile textures/images to be 
 let player1 // used as the instance of the Player class
 let spawnTileX = 26
 let spawnTileY = 10
+let spawnLevel = 0
 
 // counter variables, used for anything that will happen after a certain number of loops/frames
 let counter = 0 // used for the delay between swapping walking sprites while player is moving
@@ -86,19 +87,19 @@ let level1 = {
   // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
     [6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 0
     [6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 1
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 2
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 3
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 4
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 6
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 7
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 8
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 9
-    [6, 6, 6, 6, 6, 6, 6, 3, 3, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 10
-    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 11
-    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 12
-    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 13
-    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 2
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 6
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 7
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 8
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 11
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 12
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 13
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 14
     [6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
   ],
 
@@ -171,13 +172,65 @@ let level2 = {
     [1, 1, 1, 1, 1, 1, 1,12, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
   ],
 
+  
+
   startTileX : 7,
   startTileY : 14
 }
 
+let level3 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 0
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 1
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 2
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 6
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 7
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 8
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 11
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 12
+    [6, 6, 6, 6, 6, 6, 6, 6, 3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 13
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 1, 1,15, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  
+
+  startTileX : 9,
+  startTileY : 12
+}
+
 
 // level control variables
-let levels = [level0, level1, level2]
+let levels = [level0, level1, level2, level3]
 let currentLevel = 0
 let graphicMap
 let tileRules
@@ -240,17 +293,7 @@ class Tile { //creates class for a tile
   }
 }
 
-// class TileRules { //creates class for a tile's rules (collision, level transition etc)
-//   constructor(tileX, tileY, tileSize, tileID) {
-//     this.tileX = tileX; //x position of tile in tileMap grid
-//     this.tileY = tileY; //y position of tile in tileMap grid
-//     this.tileSize = tileSize; //size of tiles in pixels
-//     this.xPos = this.tileX * this.tileSize; //x pixel position of tile in canvas
-//     this.yPos = this.tileY * this.tileSize; //y pixel position of tile in canvas
-//     this.tileID = tileID;
-//   }
 
-// }
 
 class Player {
   constructor(currentSpriteGroup, startX, startY){
@@ -274,6 +317,22 @@ class Player {
     this.attacking = false // is player attacking
     this.damagedRecently = false // has player been recently damaged
     this.alive = true
+  }
+
+  levelChangeCheck(tileRuleValue, levelChangeTo, newPlayerTileX, newPlayerTileY, RespawnLevel, RespawnX, RespawnY, tileY, tileX) {
+    if (tileRules[tileY][tileX] == tileRuleValue){ // checks if tile is a level changer 
+      if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+        //where the player will spawn if entering level0 from a 10 tile rule
+        levels[levelChangeTo].startTileX = newPlayerTileX
+        levels[levelChangeTo].startTileY = newPlayerTileY
+        currentLevel = levelChangeTo
+        //changes where player respawns on death vv
+        spawnTileX = RespawnX
+        spawnTileY = RespawnY
+        spawnLevel = RespawnLevel
+        loadLevel()
+      }
+    }
   }
 
   move() {                                                               
@@ -314,50 +373,25 @@ class Player {
         
 //Checking for level change tiles vv
 
-        if (tileRules[tileY][tileX] == 11){ // checks if tile is a level changer 
-          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
-            levels[1].startTileX = 16
-            levels[1].startTileY = 14
-            currentLevel = 1
-            loadLevel()
-          }
-        }
+//tileRuleValue, levelChangeTo, newPlayerTileX, newPlayerTileY, RespawnLevel, RespawnX, RespawnY, tileY, tileX
+        this.levelChangeCheck(10, 0, 16, 1, 0, 26, 10, tileY, tileX)
+        this.levelChangeCheck(11, 1, 16, 14, 1, 10, 10, tileY, tileX)
+        this.levelChangeCheck(12, 0, 7, 1, 0, 26, 10, tileY, tileX)
+        this.levelChangeCheck(13, 2, 7, 14, 1, 10, 10, tileY, tileX)
+        this.levelChangeCheck(14, 3, 9, 12, 1, 10, 10, tileY, tileX)
+        this.levelChangeCheck(15, 1, 9, 2, 1, 10, 10, tileY, tileX)
 
-        if (tileRules[tileY][tileX] == 10){ // checks if tile is a level changer 
-          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
-            //where the player will spawn if entering level0 from a 10 tile rule
-            levels[0].startTileX = 16
-            levels[0].startTileY = 1
-            currentLevel = 0
-            //changes where player respawns on death vv
-            spawnTileX = 26
-            spawnTileY = 10
-            loadLevel()
-          }
-        }
 
-        if (tileRules[tileY][tileX] == 12){ // checks if tile is a level changer 
-          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
-            //where the player will spawn if entering level0 from a 12 tile rule
-            levels[0].startTileX = 7
-            levels[0].startTileY = 1
-            currentLevel = 0
-            //changes where player respawns on death vv
-            spawnTileX = 26
-            spawnTileY = 10
-            loadLevel()
-          }
-        }
 
-        if (tileRules[tileY][tileX] == 13){ // checks if tile is a level changer 
-          if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
-            //where the player will spawn if entering level2 from a 13 tile rule
-            levels[2].startTileX = 7
-            levels[2].startTileY = 14
-            currentLevel = 2
-            loadLevel()
-          }
-        }
+        // if (tileRules[tileY][tileX] == 15){ // checks if tile is a level changer 
+        //   if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
+        //     //where the player will spawn if entering level2 from a 13 tile rule
+        //     levels[1].startTileX = 9
+        //     levels[1].startTileY = 2
+        //     currentLevel = 1
+        //     loadLevel()
+        //   }
+        // }
 
 //checking tile collision vv
 
@@ -503,7 +537,7 @@ class Player {
         this.directionState = down
         this.currentSpriteGroup = sprites.knight_down
         this.alive = true
-        currentLevel = 0
+        currentLevel = spawnLevel
         levels[currentLevel].startTileX = spawnTileX
         levels[currentLevel].startTileY = spawnTileY
         loadLevel()
