@@ -6,20 +6,22 @@ let tileSize = 50 // height and width of each tile
 let hudSize = 100 // height of top bar on screen, showing player health
 let textures = [] // creates array for the different tile textures/images to be loaded into
 let player1 // used as the instance of the Player class
+
+// where player spawns and respawns at start of game vv (before finding anywhere different to respawn from like a village)
+let spawnLevel = 0
 let spawnTileX = 26
 let spawnTileY = 10
-let spawnLevel = 0
 
 // counter variables, used for anything that will happen after a certain number of loops/frames
 let counter = 0 // used for the delay between swapping walking sprites while player is moving
 let counter1 = 0 // used for a time of invincibility after the player is hit
 let counter2 = 0 // used  for the alpha value for the blackness of the screen increasing when the player dies
-
+let counter3 = 0; // used for npc dialogue rotation
 
 let tileIsCollidable = false
-let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with
-let collidableTiles = 0 // count of how many collidable tiles there are
-
+let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with on the map
+let collidableTiles = 0 // count of how many collidable tiles there are on the map
+let collidableTilesList = [1,80,81]
 
 // ensures this.directionState and this.DirectionOfCollision can only be one of four directions at one time. 
 // vv
@@ -31,6 +33,46 @@ let right = 3
 let attackRange = 25
 
 
+//Slime info
+let redSlime;
+let redSlimeSprite;
+let redSlimeXpos = 50;
+let tileY_enemy = 100;
+let enemyHp = 10;
+
+//npc info
+let NPCXpos = 100;
+let NPCYpos = 150;
+let textPaddingX = 10; 
+let textPaddingY = 10;
+
+let dialogue = [
+  [// questgiverNPC
+    "Hello Traveller, please help our people!",
+    "The slimes have infested a nearby cave!",
+    "Our townspeople usually mine its resources,",
+    "and sell them to pay for our imported goods.",
+    "But now it's too dangerous.",
+    "Without access to that cave, we'll starve!",
+    "It's entrance is just to the South of our town, Ravenwind.",
+    "Please Traveller, save us!",
+    "" // delay to indicate end of what npc has to say
+  ],
+  [// healerNPC
+    "Let's get you patched up, Traveller.",
+    "Please be more careful next time...",
+    ""
+  ]
+
+];
+
+//TILE MAPS
+
+// TILE RULES:
+// 0 = Walkable.
+// 1 = Collision tile.
+// 10 and onwards = Level changer
+// 80 and onwards = NPC. NPCs are also collision tiles.
 
 let level0 = {
 
@@ -88,14 +130,14 @@ let level1 = {
     [6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 0
     [6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 1
     [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 2
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 3
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6, 2, 3, 6, 6, 6, 6, 6, 6, 6], // 4
     [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
     [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 6
     [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 7
     [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 8
-    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 9
-    [6, 6, 6, 6, 6, 6, 6, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 3, 3, 0, 0, 2, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 10
     [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 11
     [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 12
     [6, 6, 6, 6, 6, 6, 6, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 6, 6, 6, 6, 6, 6, 6], // 13
@@ -107,25 +149,25 @@ let level1 = {
   //    THESE ARE OUR Y VALUES
   // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
-    [1, 1, 1, 1, 1, 1, 1, 1, 1,14, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 1,14, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,18, 1, 1, 1, 1, 1, 1, 1, 1], // 1
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 2
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,20, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 4
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 6
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 7
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 8
-    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 9
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
-    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,80, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,10,10,10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
   ],
 
-  startTileX : 16,
-  startTileY : 14
+  startTileX : 0,
+  startTileY : 0
 }
 
 let level2 = {
@@ -174,8 +216,8 @@ let level2 = {
 
   
 
-  startTileX : 7,
-  startTileY : 14
+  startTileX : 0,
+  startTileY : 0
 }
 
 let level3 = {
@@ -224,13 +266,162 @@ let level3 = {
 
   
 
-  startTileX : 9,
-  startTileY : 12
+  startTileX : 0,
+  startTileY : 0
 }
 
+let level4 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 0
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 1
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 2
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 2, 2, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 6
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 7
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 8
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 6, 2, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 11
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 12
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 13
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,81, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  
+
+  startTileX : 0,
+  startTileY : 0
+}
+
+let level5 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 0
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 1
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 2
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 6
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 7
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6], // 8
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6], // 11
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 4, 4, 4, 3, 6, 6, 6, 6, 6, 6, 6], // 12
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 6, 3, 6, 6, 6, 6, 6, 6, 6], // 13
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,19, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  
+
+  startTileX : 0,
+  startTileY : 0
+}
+
+let level6 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 0
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 1
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 2, 2, 2, 6, 6, 6, 6, 6, 6, 6], // 2
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6], // 3
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6], // 4
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 4, 4, 4, 2, 6, 6, 6, 6, 6, 6, 6], // 5   THESE ARE OUR X VALUES
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 2, 2, 6, 2, 2, 6, 6, 6, 6, 6, 6, 6], // 6
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 7
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 8
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 9
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 10
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 11
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 12
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 13
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 4
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,21, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 7
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 8
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 9
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  
+
+  startTileX : 0,
+  startTileY : 0
+}
 
 // level control variables
-let levels = [level0, level1, level2, level3]
+let levels = [level0, level1, level2, level3, level4, level5, level6]
 let currentLevel = 0
 let graphicMap
 let tileRules
@@ -307,7 +498,7 @@ class Player {
     this.directionOfCollision = 4 // used to know what way the player cannot walk on collisons (4 is the state of no collision occouring)
     this.speed = 0.08 // player movement speed
     this.hitboxSize = 40 // slightly smaller than tile size so player can fit between two with a 1 tile wide gap without difficulty
-    this.maxHealth = 100 // player's maximum health at astart of gameplay 
+    this.maxHealth = 50 // player's maximum health at astart of gameplay 
     this.currentHealth = this.maxHealth // starts on max health
     this.isMoving = false // is player moving
     this.leg = 0  // 0 is state for no legs moving, for standing still/not walking
@@ -371,35 +562,54 @@ class Player {
     for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
       for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
         
-//Checking for level change tiles vv
+//Checking for spawn npc tile rules vv
+        if (tileRules[tileY][tileX] == 80){
+          questgiverNPC.display(tileY,tileX)
+          if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
+            questgiverNPC.speak(tileY,tileX)
+          }
+          else{
+            questgiverNPC.resetSpeech()
+          }
 
+        }
+        if (tileRules[tileY][tileX] == 81){
+          healerNPC.display(tileY,tileX)
+          if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
+            healerNPC.speak(tileY,tileX)
+            player1.currentHealth = player1.maxHealth
+          }
+          else{
+            healerNPC.resetSpeech()
+          }
+          
+        }
+//Checking for level change tile rules vv
 //tileRuleValue, levelChangeTo, newPlayerTileX, newPlayerTileY, RespawnLevel, RespawnX, RespawnY, tileY, tileX
-        this.levelChangeCheck(10, 0, 16, 1, 0, 26, 10, tileY, tileX)
-        this.levelChangeCheck(11, 1, 16, 14, 1, 10, 10, tileY, tileX)
-        this.levelChangeCheck(12, 0, 7, 1, 0, 26, 10, tileY, tileX)
-        this.levelChangeCheck(13, 2, 7, 14, 1, 10, 10, tileY, tileX)
-        this.levelChangeCheck(14, 3, 9, 12, 1, 10, 10, tileY, tileX)
-        this.levelChangeCheck(15, 1, 9, 2, 1, 10, 10, tileY, tileX)
+        this.levelChangeCheck(10, 0, 16, 1, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)// spawnLevel spawnTileX and spawnTileY being kept same means player hasn't entered a place that changes where they will respawn.
+        this.levelChangeCheck(11, 1, 16, 14, 4, 12, 8, tileY, tileX) // spawnLevel spawnTileX and spawnTileY being changed occurs when player enters a place that changes where they will respawn upon death. (usually entering a village for example)
+        this.levelChangeCheck(12, 0, 7, 1, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(13, 2, 7, 14, spawnLevel, spawnTileX, spawnTileY, tileY, tileX) 
+        this.levelChangeCheck(14, 3, 9, 12, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(15, 1, 9, 2, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(16, 4, 12, 9, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(17, 1, 12, 11, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(18, 5, 23, 12, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(19, 1, 23, 2, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(20, 6, 22, 5, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(21, 1, 22, 6, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
 
-
-
-        // if (tileRules[tileY][tileX] == 15){ // checks if tile is a level changer 
-        //   if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
-        //     //where the player will spawn if entering level2 from a 13 tile rule
-        //     levels[1].startTileX = 9
-        //     levels[1].startTileY = 2
-        //     currentLevel = 1
-        //     loadLevel()
-        //   }
-        // }
 
 //checking tile collision vv
 
         tileIsCollidable = false // variable set to false by default before checking the next tile
-        if (tileRules[tileY][tileX] == 1){ // checks if this tile is collidable
-          tileIsCollidable = true // variable set to true if value for tile is collidable
-        }
-        
+
+        for (let i = 0; i < collidableTilesList.length; i++){
+          if (tileRules[tileY][tileX] == collidableTilesList[i]){ // checks if this tile is collidable
+            tileIsCollidable = true // variable set to true if value for tile is collidable
+          }
+      }
+
         if (tileIsCollidable == true){ // if tile is labelled to have collision
           collidableTiles += 1 // count of how many collidable tiles there are
           if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it (and a collision has not yet occured with another tile)
@@ -499,6 +709,7 @@ class Player {
   hud(){
     if (this.alive == true){
       fill(50,100,50)
+      noStroke()
       rect(0,0,1600,hudSize)
     }
     this.healthbar()
@@ -562,6 +773,77 @@ class Player {
 
 }
 
+class Enemy {
+  constructor(enemySprite, enemyHp) {
+    this.enemySprite = enemySprite;
+    this.enemyHp = enemyHp;
+  }
+
+  display(tileY_enemy,tileX_enemy) {
+    // Displays the sprite
+    image(this.enemySprite, this.tileX_enemy, this.tileY_enemy, tileSize, tileSize);
+
+    // Displays HP above the slime’s head
+    fill("black");
+    textSize(15);
+    text(
+      this.enemyHp,
+      tileX_enemy*tileSize + (tileSize/2),
+      (tileY_enemy*tileSize) + hudSize - (tileSize/4) // Moves HP above the slime
+    );
+  }
+}
+
+
+
+class Npc {
+  constructor(NPCSprite, dialogues, dialogueChangeSpeed) {
+    this.NPCSprite = NPCSprite;
+    this.NPCXpos = NPCXpos;
+    this.NPCYpos = NPCYpos;
+    this.dialogues = dialogues; // Array of dialogue lines
+    this.dialogueChangeSpeed = 1000 * dialogueChangeSpeed // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
+
+    this.currentDialogueIndex = 0; // Tracks which dialogue line to display
+  }
+
+  display(tileY_NPC,tileX_NPC) {
+    // Displays the NPC sprite
+    image(this.NPCSprite, tileX_NPC*tileSize + (tileSize/2), (tileY_NPC*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize);
+  }
+
+  speak(tileY_NPC,tileX_NPC) {
+    if (counter3 < this.dialogueChangeSpeed) {
+        // Display current dialogue
+        stroke(255)
+        fill(0)
+        textSize(15);
+        text(
+          this.dialogues[this.currentDialogueIndex],
+          tileX_NPC*tileSize + (tileSize/2),
+          (tileY_NPC*tileSize) + hudSize - (tileSize/4) // sits above npc
+        );
+
+    } 
+    else {
+      // Move to next dialogue and reset timer
+      this.currentDialogueIndex++;
+      if (this.currentDialogueIndex >= this.dialogues.length) {
+        this.currentDialogueIndex = 0; // Loop back to the first dialogue
+      }
+      counter3 = 0; // Reset timer
+    }
+    counter3++
+  }
+
+  resetSpeech(){
+    this.currentDialogueIndex = 0; // Reset to the first dialogue
+    counter3 = 0; // Reset timer
+  }
+}
+
+
+
 function preload() { //tiles
   textures[0] = loadImage('sprites/tile_grass.png') 
   textures[1] = loadImage('sprites/tile_water.png')
@@ -581,19 +863,28 @@ function preload() { //tiles
     // group of sprites. Each group containing the sword sprite for a single direction of movement.
     sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')]
   }
-  
+
+  redSlimeSprite = loadImage("sprites/redSlime.png");
+  questgiverNPCSprite = loadImage("sprites/ladyNPC.png");
 }
+
+
 
 function setup() {
   createCanvas(1600,800 + hudSize);
   imageMode(CENTER)
   rectMode(CORNER)
-
+  textAlign(CENTER,CENTER)
 
   player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize) // instance of Player class
-  
+  redSlime = new Enemy(redSlimeSprite, redSlimeXpos, tileY_enemy, enemyHp, textPaddingX, textPaddingY);
+                                  // dialogue array // speed at which npc speech is cycled through, *60 to make dialogueChangeSpeed be in seconds
+  questgiverNPC = new Npc(questgiverNPCSprite, dialogue[0], 5); // basic civilian
+  healerNPC = new Npc(questgiverNPCSprite, dialogue[1], 5); // basic civilian
   loadLevel()
 }
+
+
 
 function loadLevel() {
 
@@ -616,6 +907,8 @@ function loadLevel() {
   }
 }
 
+
+
 function draw() {
   background(100) // 
   for (let tileX = 0; tileX < tilesX; tileX++) { // loops the tile display for how many tiles there are horizontally
@@ -630,7 +923,15 @@ function draw() {
     player1.hud()
     player1.damageCheck()
     player1.deathScreen()
+
   }
 
   //tileMap[5][6].displayMessage()//adding a message to specified tiles
 }
+
+
+
+
+
+
+
