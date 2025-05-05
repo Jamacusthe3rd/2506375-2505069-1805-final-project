@@ -16,12 +16,12 @@ let spawnTileY = 10
 let counter = 0 // used for the delay between swapping walking sprites while player is moving
 let counter1 = 0 // used for a time of invincibility after the player is hit
 let counter2 = 0 // used  for the alpha value for the blackness of the screen increasing when the player dies
-let counter3 = 0; // used for npc dialogue rotation
+
 
 let tileIsCollidable = false
 let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with on the map
 let collidableTiles = 0 // count of how many collidable tiles there are on the map
-let collidableTilesList = [1,80,81,82,83,84]
+let collidableTilesList = [1,80,81,82,83,84,85]
 
 // ensures this.directionState and this.DirectionOfCollision can only be one of four directions at one time. 
 // vv
@@ -45,7 +45,7 @@ let healerDialogue = 1
 
 //NPC dialogues
 let dialogue = [
-  [// questgiverNPC
+  [// questgiverNPC (dialogue 0)
     "Traveller, please help our people!",
     "The slimes have infested a nearby cave!",
     "Our townspeople usually mine its resources,",
@@ -66,13 +66,18 @@ let dialogue = [
     "Don't get yourself killed.",
     ""
   ],
-  [// Back Right house resident
+  [// Back Right house resident (dialogue 3)
     "Something's off with the castle walls behind my house...",
     "Eh, I'm sure it's nothing.",
     ""
   ],
-  [// Guards
+  [// Guards (dialogue 4)
     "Welcome to Ravenwind",
+    ""
+  ],
+  [// Kid (dialogue 5)
+    "I'm gonna be a Ravenwind guard one day!",
+    "Just you wait!",
     ""
   ],
 ];
@@ -172,7 +177,7 @@ let level1 = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 10
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,80, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 11
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 12
-    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
+    [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,85, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 13
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 14
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1,10,10,10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
   ],
@@ -638,8 +643,6 @@ class Player {
         
 // Checking for SPAWN NPC tile rules vv
 
-//Questgiver
-        this.basicNPCs(80,questgiverNPC,0,tileY,tileX)
 //Healer
         if (tileRules[tileY][tileX] == 81){
           healerNPC.display(tileY,tileX)
@@ -653,11 +656,15 @@ class Player {
           }
           
         }
+//Questgiver
+        this.basicNPCs(80,questgiverNPC,0,tileY,tileX)
 //Back Right house resident
-        this.basicNPCs(82,questgiverNPC,3,tileY,tileX)
+        this.basicNPCs(82,residentNPC,3,tileY,tileX)
 //Guards
         this.basicNPCs(83,guard1NPC,4,tileY,tileX)
         this.basicNPCs(84,guard2NPC,4,tileY,tileX)
+//Kid
+        this.basicNPCs(85,kid1NPC,5,tileY,tileX)
 
 // Checking for TILE TOPPER tile rules vv (stuff on top of tiles. Like ladder, boat, or household objects/furniture)
         if (tileRules[tileY][tileX] == 22){
@@ -882,11 +889,10 @@ class Enemy {
 
 
 class Npc {
-  constructor(NPCSprite, dialogues, dialogueChangeSpeed) {
+  constructor(NPCSprite, dialogueChangeSpeed) {
     this.NPCSprite = NPCSprite;
-    this.dialogues = dialogues; // Array of dialogue lines
     this.dialogueChangeSpeed = 1000 * dialogueChangeSpeed // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
-
+    this.counter3 = 0 // used for npc dialogue rotation. Needed to change this to be in the npc constructor, so two NPCs on the same map still had individual counters.
     this.currentDialogueIndex = 0; // Tracks which dialogue line to display
   }
 
@@ -896,7 +902,7 @@ class Npc {
   }
 
   speak(dialogueType,tileY_NPC,tileX_NPC) {
-    if (counter3 < this.dialogueChangeSpeed) {
+    if (this.counter3 < this.dialogueChangeSpeed) {
         // Display current dialogue
         stroke(255)
         fill(0)
@@ -914,14 +920,14 @@ class Npc {
       if (this.currentDialogueIndex >= dialogue[dialogueType].length) {
         this.currentDialogueIndex = 0; // Loop back to the first dialogue
       }
-      counter3 = 0; // Reset timer
+      this.counter3 = 0; // Reset timer
     }
-    counter3++
+    this.counter3++
   }
 
   resetSpeech(){
     this.currentDialogueIndex = 0; // Reset to the first dialogue
-    counter3 = 0; // Reset timer
+    this.counter3 = 0; // Reset timer
   }
 }
 
@@ -957,10 +963,12 @@ function preload() {
   redSlimeSprite = loadImage("sprites/redSlime.png")
 
   //NPCs
-  questgiverNPCSprite = loadImage("sprites/NPC_Lady.png")
+  questgiverNPCSprite = loadImage("sprites/NPC_Questgiver.png")
   guard1NPCSprite = loadImage("sprites/NPC_Guard1.png")
   guard2NPCSprite = loadImage("sprites/NPC_Guard2.png")
-  
+  healerNPCSprite = loadImage("sprites/NPC_Healer.png")
+  kid1NPCSprite = loadImage("sprites/NPC_Kid1.png")
+  residentNPCSprite = loadImage("sprites/NPC_Resident.png")
 }
 
 
@@ -974,11 +982,13 @@ function setup() {
   player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize) // instance of Player class
 
   redSlime = new Enemy(redSlimeSprite, enemyHp);
-                                        // dialogue array // speed at which npc speech is cycled through, *60 to make dialogueChangeSpeed be in seconds
-  questgiverNPC = new Npc(questgiverNPCSprite, dialogue[0], 5); // basic civilian
-  healerNPC = new Npc(questgiverNPCSprite, dialogue[1], 5); // healer, in a cloak
-  guard1NPC = new Npc(guard1NPCSprite, dialogue[4], 5); // healer, in a cloak
-  guard2NPC = new Npc(guard2NPCSprite, dialogue[4], 5); // healer, in a cloak
+                                      // dialogue array // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
+  questgiverNPC = new Npc(questgiverNPCSprite, 5); // basic civilian
+  healerNPC = new Npc(healerNPCSprite, 6); // healer, in a robe
+  guard1NPC = new Npc(guard1NPCSprite, 5); // guard, in a cloak
+  guard2NPC = new Npc(guard2NPCSprite, 5); // guard, in a cloak
+  kid1NPC = new Npc(kid1NPCSprite, 5) // kid, in a cloak, dressed up like the guards
+  residentNPC = new Npc(residentNPCSprite, 5) // basic civillian
 
   loadLevel()
 }
