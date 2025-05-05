@@ -21,7 +21,7 @@ let counter3 = 0; // used for npc dialogue rotation
 let tileIsCollidable = false
 let collidableTiles_NotCollidedWith = 0 // count of how many collidable tiles there are that the player hasn't collided with on the map
 let collidableTiles = 0 // count of how many collidable tiles there are on the map
-let collidableTilesList = [1,80,81]
+let collidableTilesList = [1,80,81,82,83,84]
 
 // ensures this.directionState and this.DirectionOfCollision can only be one of four directions at one time. 
 // vv
@@ -40,30 +40,41 @@ let redSlimeXpos = 50;
 let tileY_enemy = 100;
 let enemyHp = 10;
 
-//npc info
-let NPCXpos = 100;
-let NPCYpos = 150;
-let textPaddingX = 10; 
-let textPaddingY = 10;
+//unique NPC variables
+let healerDialogue = 1
 
+//NPC dialogues
 let dialogue = [
   [// questgiverNPC
-    "Hello Traveller, please help our people!",
+    "Traveller, please help our people!",
     "The slimes have infested a nearby cave!",
     "Our townspeople usually mine its resources,",
-    "and sell them to pay for our imported goods.",
+    "and sell them to pay for our imports.",
     "But now it's too dangerous.",
-    "Without access to that cave, we'll starve!",
+    "Without access to that cave, we'll soon starve!",
     "It's entrance is just to the South of our town, Ravenwind.",
     "Please Traveller, save us!",
     "" // delay to indicate end of what npc has to say
   ],
-  [// healerNPC
+  [// healerNPC (dialogue 1) // healing damaged player
     "Let's get you patched up, Traveller.",
-    "Please be more careful next time...",
+    "Be careful out there...",
     ""
-  ]
-
+  ],
+  [// healerNPC (dialogue 2) // healing dead player
+    "You're lucky someone found you out there Traveller...",
+    "Don't get yourself killed.",
+    ""
+  ],
+  [// Back Right house resident
+    "Something's off with the castle walls behind my house...",
+    "Eh, I'm sure it's nothing.",
+    ""
+  ],
+  [// Guards
+    "Welcome to Ravenwind",
+    ""
+  ],
 ];
 
 //TILE MAPS
@@ -71,7 +82,7 @@ let dialogue = [
 // TILE RULES:
 // 0 = Walkable.
 // 1 = Collision tile.
-// 10 and onwards = Level changer
+// 10 and onwards = Level changer. Sometimes includes a tile topper like a ladder.
 // 80 and onwards = NPC. NPCs are also collision tiles.
 
 let level0 = {
@@ -102,7 +113,7 @@ let level0 = {
   // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
     [1, 1, 1, 1, 1, 1, 1,13, 1, 1, 1, 1, 1, 1, 1,11,11,11, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
-    [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
+    [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1,83, 0, 0, 0,84, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 2
     [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 3
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1], // 4
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
@@ -111,7 +122,7 @@ let level0 = {
     [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 8
     [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 9
     [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 10
-    [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
+    [1, 1, 1, 1, 1, 1, 0, 0,22, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1], // 11
     [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 12
     [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], // 13
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1], // 14
@@ -399,7 +410,7 @@ let level6 = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 1
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 2
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,82, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 3
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 4
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1], // 5   THESE ARE OUR X VALUES
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,21, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 6
@@ -420,8 +431,58 @@ let level6 = {
   startTileY : 0
 }
 
+let level7 = {
+
+  graphicMap: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6], // 0
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 1
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 2
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 3
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 4
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 5   THESE ARE OUR X VALUES
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 6
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 7
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 8
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 9
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 10
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 11
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 12
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 13
+    [6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6], // 14
+    [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]  // 15
+  ],
+
+  tileRules: [
+  //    THESE ARE OUR Y VALUES
+  // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 1
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 3
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 4
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 5   THESE ARE OUR X VALUES
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 7
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 8
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 9
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 10
+    [1, 0, 0, 0, 0, 0, 0, 0,23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 11
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 12
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 13
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 14
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
+  ],
+
+  
+
+  startTileX : 0,
+  startTileY : 0
+}
+
 // level control variables
-let levels = [level0, level1, level2, level3, level4, level5, level6]
+let levels = [level0, level1, level2, level3, level4, level5, level6, level7]
 let currentLevel = 0
 let graphicMap
 let tileRules
@@ -509,6 +570,19 @@ class Player {
     this.damagedRecently = false // has player been recently damaged
     this.alive = true
   }
+  
+  basicNPCs(NPCTileRulesVal,NPCName,dialogueType,tileY,tileX) {
+    if (tileRules[tileY][tileX] == NPCTileRulesVal){
+      NPCName.display(tileY,tileX)
+      if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
+        NPCName.speak(dialogueType,tileY,tileX)
+      }
+      else{
+        NPCName.resetSpeech()
+      }
+
+    }
+  }
 
   levelChangeCheck(tileRuleValue, levelChangeTo, newPlayerTileX, newPlayerTileY, RespawnLevel, RespawnX, RespawnY, tileY, tileX) {
     if (tileRules[tileY][tileX] == tileRuleValue){ // checks if tile is a level changer 
@@ -562,29 +636,38 @@ class Player {
     for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
       for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
         
-//Checking for spawn npc tile rules vv
-        if (tileRules[tileY][tileX] == 80){
-          questgiverNPC.display(tileY,tileX)
-          if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
-            questgiverNPC.speak(tileY,tileX)
-          }
-          else{
-            questgiverNPC.resetSpeech()
-          }
+// Checking for SPAWN NPC tile rules vv
 
-        }
+//Questgiver
+        this.basicNPCs(80,questgiverNPC,0,tileY,tileX)
+//Healer
         if (tileRules[tileY][tileX] == 81){
           healerNPC.display(tileY,tileX)
           if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
-            healerNPC.speak(tileY,tileX)
+            healerNPC.speak(healerDialogue,tileY,tileX)
             player1.currentHealth = player1.maxHealth
           }
           else{
             healerNPC.resetSpeech()
+            healerDialogue = 1
           }
           
         }
-//Checking for level change tile rules vv
+//Back Right house resident
+        this.basicNPCs(82,questgiverNPC,3,tileY,tileX)
+//Guards
+        this.basicNPCs(83,guard1NPC,4,tileY,tileX)
+        this.basicNPCs(84,guard2NPC,4,tileY,tileX)
+
+// Checking for TILE TOPPER tile rules vv (stuff on top of tiles. Like ladder, boat, or household objects/furniture)
+        if (tileRules[tileY][tileX] == 22){
+          image(ladderDown, tileX*tileSize + (tileSize/2), (tileY*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize)
+        }
+        if (tileRules[tileY][tileX] == 23){
+          image(ladderUp, tileX*tileSize + (tileSize/2), (tileY*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize)
+        }
+//Checking for LEVEL CHANGE tile rules vv
+
 //tileRuleValue, levelChangeTo, newPlayerTileX, newPlayerTileY, RespawnLevel, RespawnX, RespawnY, tileY, tileX
         this.levelChangeCheck(10, 0, 16, 1, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)// spawnLevel spawnTileX and spawnTileY being kept same means player hasn't entered a place that changes where they will respawn.
         this.levelChangeCheck(11, 1, 16, 14, 4, 12, 8, tileY, tileX) // spawnLevel spawnTileX and spawnTileY being changed occurs when player enters a place that changes where they will respawn upon death. (usually entering a village for example)
@@ -598,7 +681,8 @@ class Player {
         this.levelChangeCheck(19, 1, 23, 2, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
         this.levelChangeCheck(20, 6, 22, 5, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
         this.levelChangeCheck(21, 1, 22, 6, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
-
+        this.levelChangeCheck(22, 7, 8, 12, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
+        this.levelChangeCheck(23, 0, 8, 10, spawnLevel, spawnTileX, spawnTileY, tileY, tileX)
 
 //checking tile collision vv
 
@@ -723,7 +807,7 @@ class Player {
     fill(200,0,0)
     noStroke()
     textSize(30)//scales text size
-    text(this.currentHealth,20,45)//text display of health
+    text(this.currentHealth,50,40)//text display of health
     rect(20,50,this.maxHealth/(this.maxHealth/this.currentHealth),20) // healthbar (decreasing part when player is damaged)
   }            //bar length                        //bar thickness
 
@@ -753,6 +837,7 @@ class Player {
         levels[currentLevel].startTileY = spawnTileY
         loadLevel()
 
+        healerDialogue = 2
         counter2 = 0
       }
     }
@@ -799,8 +884,6 @@ class Enemy {
 class Npc {
   constructor(NPCSprite, dialogues, dialogueChangeSpeed) {
     this.NPCSprite = NPCSprite;
-    this.NPCXpos = NPCXpos;
-    this.NPCYpos = NPCYpos;
     this.dialogues = dialogues; // Array of dialogue lines
     this.dialogueChangeSpeed = 1000 * dialogueChangeSpeed // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
 
@@ -812,14 +895,14 @@ class Npc {
     image(this.NPCSprite, tileX_NPC*tileSize + (tileSize/2), (tileY_NPC*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize);
   }
 
-  speak(tileY_NPC,tileX_NPC) {
+  speak(dialogueType,tileY_NPC,tileX_NPC) {
     if (counter3 < this.dialogueChangeSpeed) {
         // Display current dialogue
         stroke(255)
         fill(0)
         textSize(15);
         text(
-          this.dialogues[this.currentDialogueIndex],
+          dialogue[dialogueType][this.currentDialogueIndex],
           tileX_NPC*tileSize + (tileSize/2),
           (tileY_NPC*tileSize) + hudSize - (tileSize/4) // sits above npc
         );
@@ -828,7 +911,7 @@ class Npc {
     else {
       // Move to next dialogue and reset timer
       this.currentDialogueIndex++;
-      if (this.currentDialogueIndex >= this.dialogues.length) {
+      if (this.currentDialogueIndex >= dialogue[dialogueType].length) {
         this.currentDialogueIndex = 0; // Loop back to the first dialogue
       }
       counter3 = 0; // Reset timer
@@ -844,7 +927,8 @@ class Npc {
 
 
 
-function preload() { //tiles
+function preload() { 
+  //Tiles
   textures[0] = loadImage('sprites/tile_grass.png') 
   textures[1] = loadImage('sprites/tile_water.png')
   textures[2] = loadImage('sprites/tile_wood.png')
@@ -853,6 +937,7 @@ function preload() { //tiles
   textures[5] = loadImage('sprites/tile_stone_floor.png')
   textures[6] = loadImage('sprites/tile_void.png')
 
+  //Player
   sprites = { //groups of sprites. 
   // Each group here containing the still and walking sprites for a single direction of movement.
     knight_up: [loadImage('sprites/knight_up_still.png'),loadImage('sprites/knight_up_leftlegwalk.png'),loadImage('sprites/knight_up_rightlegwalk.png')],
@@ -864,23 +949,37 @@ function preload() { //tiles
     sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')]
   }
 
-  redSlimeSprite = loadImage("sprites/redSlime.png");
-  questgiverNPCSprite = loadImage("sprites/ladyNPC.png");
+  //Objects
+  ladderDown = loadImage("sprites/tile_topper_ladderdown.png")
+  ladderUp = loadImage("sprites/tile_topper_ladderup.png")
+
+  //Enemies
+  redSlimeSprite = loadImage("sprites/redSlime.png")
+
+  //NPCs
+  questgiverNPCSprite = loadImage("sprites/NPC_Lady.png")
+  guard1NPCSprite = loadImage("sprites/NPC_Guard1.png")
+  guard2NPCSprite = loadImage("sprites/NPC_Guard2.png")
+  
 }
 
 
 
 function setup() {
-  createCanvas(1600,800 + hudSize);
+  createCanvas(1600,800 + hudSize)
   imageMode(CENTER)
   rectMode(CORNER)
   textAlign(CENTER,CENTER)
 
   player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize) // instance of Player class
-  redSlime = new Enemy(redSlimeSprite, redSlimeXpos, tileY_enemy, enemyHp, textPaddingX, textPaddingY);
-                                  // dialogue array // speed at which npc speech is cycled through, *60 to make dialogueChangeSpeed be in seconds
+
+  redSlime = new Enemy(redSlimeSprite, enemyHp);
+                                        // dialogue array // speed at which npc speech is cycled through, *60 to make dialogueChangeSpeed be in seconds
   questgiverNPC = new Npc(questgiverNPCSprite, dialogue[0], 5); // basic civilian
-  healerNPC = new Npc(questgiverNPCSprite, dialogue[1], 5); // basic civilian
+  healerNPC = new Npc(questgiverNPCSprite, dialogue[1], 5); // healer, in a cloak
+  guard1NPC = new Npc(guard1NPCSprite, dialogue[4], 5); // healer, in a cloak
+  guard2NPC = new Npc(guard2NPCSprite, dialogue[4], 5); // healer, in a cloak
+
   loadLevel()
 }
 
