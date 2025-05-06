@@ -24,12 +24,16 @@ the game follows themes of fantasy and exploration. It takes inspiration from Th
 INDIVIDUAL CONTRIBUTION
 ---------------------------------------------------------------------------------------------------------
 James Stimpson:
+
 I did most of the coding for this project. I handled the Player's movement and attacking, the creation of Tile Maps, Level Transitions, and the HUD/healthbar. 
 I also heavily developed the base code for NPCs and Enemies, allowing them to work effectively in the main project and be added to levels through the Tile Rules.
 I created the narrative of the villager's struggle, using the dialogue cycle Matthew created to allow the townspeople to speak to the player. 
 This was used to make the town feel welcoming, for the functional purpose of giving info to the player, but also for giving the player a sense of responsibility, to help those who have asked you to save their village.
 I drew all of the sprites used in the final game. The tiles, the player, enemy, and NPCs. 
 
+Matthew Hands:
+
+For this project i have attempted to code an object-class inherit system using repeating values for enemies and npcs, i would be able to shorten the code down and make it simpler to understand. I've designed and added the pixel art for the sprites that will differentiate the sprites from each other. I have added a dialogue timer that will cycle between an array of possible text to display above the npcs head after a certain time has been met, it will then pause for the same amount of time before displaying a new piece of text from the array.
 ---------------------------------------------------------------------------------------------------------
 THEMES
 ---------------------------------------------------------------------------------------------------------
