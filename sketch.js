@@ -33,12 +33,7 @@ let right = 3
 let attackRange = 25
 
 
-//Slime info
-let redSlime;
-let redSlimeSprite;
-let redSlimeXpos = 50;
-let tileY_enemy = 100;
-let enemyHp = 10;
+
 
 //unique NPC variables
 let healerDialogue = 1
@@ -88,6 +83,7 @@ let dialogue = [
 // 0 = Walkable.
 // 1 = Collision tile.
 // 10 and onwards = Level changer. Sometimes includes a tile topper like a ladder.
+// 50 and onwards = Enemies.
 // 80 and onwards = NPC. NPCs are also collision tiles.
 
 let level0 = {
@@ -465,17 +461,17 @@ let level7 = {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // 0
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 1
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 2
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 3
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 4
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,53, 0, 0, 0, 0, 1], // 3
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 4
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 5   THESE ARE OUR X VALUES
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 6
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 7
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 8
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 9
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 9
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 10
     [1, 0, 0, 0, 0, 0, 0, 0,23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 11
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 12
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 13
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 13
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], // 14
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]  // 15
   ],
@@ -563,6 +559,7 @@ class Player {
     this.directionState = 0 //used for working out things like direction of collision
     this.directionOfCollision = 4 // used to know what way the player cannot walk on collisons (4 is the state of no collision occouring)
     this.speed = 0.08 // player movement speed
+    this.damage = 50
     this.hitboxSize = 40 // slightly smaller than tile size so player can fit between two with a 1 tile wide gap without difficulty
     this.maxHealth = 50 // player's maximum health at astart of gameplay 
     this.currentHealth = this.maxHealth // starts on max health
@@ -572,18 +569,42 @@ class Player {
     this.nextPosY = startY // keeps y value of where player is trying to move before actually moving them
     this.collided = false // is collision occuring
     this.attacking = false // is player attacking
+    this.damagePlayer = false // is player being hit
+    this.invincibilityTime = 3 // time being invincible after being hit in seconds
     this.damagedRecently = false // has player been recently damaged
     this.alive = true
   }
   
+  
+  basicEnemy(enemyTileRulesVal,enemyName,tileY,tileX) {
+    enemyName.onMap = false // resets each loop
+    if (tileRules[tileY][tileX] == enemyTileRulesVal){
+      if(enemyName.spawned == false){
+        enemyName.InitialiseValues(tileY,tileX) // uses tileRules to determine where enemy spawns
+        }
+
+      enemyName.onMap = true // if enemy tile rule is on this map, set to true
+      
+      enemyName.display()
+      enemyName.move()
+
+    }
+    if (enemyName.spawned == true){
+      if ((this.nextPosX >= enemyName.posX - (tileSize/2 + (this.hitboxSize/2)) && this.nextPosX <= enemyName.posX + (tileSize/2 + (this.hitboxSize/2))) && (this.nextPosY >= enemyName.posY - ((tileSize/2) + (this.hitboxSize/2)) && this.nextPosY <= enemyName.posY + (tileSize/2) + (this.hitboxSize/2)) && currentLevel == 7){ // if player is close enough to enemy to hit it and is on the same level as it
+        this.damagePlayer = true
+        this.damageTaken = enemyName.damage // player takes however much damage the enemy deals to them.
+      }
+    }
+  }
+
   basicNPCs(NPCTileRulesVal,NPCName,dialogueType,tileY,tileX) {
-    if (tileRules[tileY][tileX] == NPCTileRulesVal){
-      NPCName.display(tileY,tileX)
+    if (tileRules[tileY][tileX] == NPCTileRulesVal){ // if tileRules has a value representing an NPC
+      NPCName.display(tileY,tileX) // display that NPC
       if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
-        NPCName.speak(dialogueType,tileY,tileX)
+        NPCName.speak(dialogueType,tileY,tileX) // NPC cycles through dialogue if player is close
       }
       else{
-        NPCName.resetSpeech()
+        NPCName.resetSpeech() // preps to start dialogue from begining if player moves away from NPC
       }
 
     }
@@ -593,13 +614,13 @@ class Player {
     if (tileRules[tileY][tileX] == tileRuleValue){ // checks if tile is a level changer 
       if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to tile to have entered it
         //where the player will spawn if entering level0 from a 10 tile rule
-        levels[levelChangeTo].startTileX = newPlayerTileX
-        levels[levelChangeTo].startTileY = newPlayerTileY
-        currentLevel = levelChangeTo
+        levels[levelChangeTo].startTileX = newPlayerTileX // changes player location on screen
+        levels[levelChangeTo].startTileY = newPlayerTileY // changes player location on screen
+        currentLevel = levelChangeTo // changes level
         //changes where player respawns on death vv
-        spawnTileX = RespawnX
-        spawnTileY = RespawnY
-        spawnLevel = RespawnLevel
+        spawnTileX = RespawnX // changes player respawn location if a change is made
+        spawnTileY = RespawnY // changes player respawn location if a change is made
+        spawnLevel = RespawnLevel // changes player respawn level if a change is made
         loadLevel()
       }
     }
@@ -648,11 +669,11 @@ class Player {
           healerNPC.display(tileY,tileX)
           if ((this.nextPosX >= tileX*tileSize - (tileSize + (this.hitboxSize/2)) && this.nextPosX <= tileX*tileSize + (tileSize*2 + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (tileSize + (this.hitboxSize/2)) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize*2 + (this.hitboxSize/2)) + (hudSize))){ // if player is close enough to npc 
             healerNPC.speak(healerDialogue,tileY,tileX)
-            player1.currentHealth = player1.maxHealth
+            this.currentHealth = this.maxHealth // heals player to maxHealth
           }
           else{
-            healerNPC.resetSpeech()
-            healerDialogue = 1
+            healerNPC.resetSpeech()// preps to start dialogue from begining if player moves away from NPC
+            healerDialogue = 1 // changes dialogue cycle to basic one if player moves away from NPC, after having died and gone through the unique dialogue upon respawning
           }
           
         }
@@ -665,6 +686,14 @@ class Player {
         this.basicNPCs(84,guard2NPC,4,tileY,tileX)
 //Kid
         this.basicNPCs(85,kid1NPC,5,tileY,tileX)
+
+// Checking for SPAWN NPC tile rules vv
+
+//Blue Slimes
+        this.basicEnemy(50,blueSlime0,tileY,tileX)
+        this.basicEnemy(51,blueSlime1,tileY,tileX)
+        this.basicEnemy(52,blueSlime2,tileY,tileX)
+        this.basicEnemy(53,blueSlime3,tileY,tileX)
 
 // Checking for TILE TOPPER tile rules vv (stuff on top of tiles. Like ladder, boat, or household objects/furniture)
         if (tileRules[tileY][tileX] == 22){
@@ -761,15 +790,22 @@ class Player {
     this.currentSprite = this.currentSpriteGroup[this.leg] //updates current player sprite, depending on direction looking, and if moving or stationary
   }
 
+  enemyDamageCheck_UP(enemyName){ //has enemy been hit by player's attack
+    if ((this.posX >= enemyName.xPos - (enemyName.hitboxSize/2) && this.posX <= enemyName.xPos + (enemyName.hitboxSize/2)) && (this.posY - attackRange >= enemyName.yPos - (enemyName.hitboxSize/2) && this.posY - attackRange <= enemyName.xPos + (enemyName.hitboxSize/2)) && enemyName.alive == true && enemyName.damagedRecently == false){ // if weapon is close enough to enemy to have hit it
+      enemyName.currentHealth += - this.damage
+      enemyName.damagedRecently = true
+      console.log("HIT")
+    }
+  }
+
   attack (){
-    if (keyIsDown(32)){
+    if (keyIsDown(32)){ //SPACEBAR
       this.attacking = true
 
       if (this.directionState == up){
         image(sprites.sword[this.directionState],this.posX,this.posY - attackRange,tileSize/2,tileSize)
-
-        //playerWeaponHitbox = (!(enemyX - (enemySize/2) >= this.posX + (this.hitboxSize/2) && enemyX + (enemySize/2) <= this.posX - (this.hitboxSize/2) && enemyY + (enemySize/2) <= this.posY - (this.hitboxSize + (this.hitboxSize/2)) && enemyY - (enemySize/2) >= this.posY + (-this.hitboxSize + (this.hitboxSize/2))))
       }
+          
       if (this.directionState == left){
         image(sprites.sword[this.directionState],this.posX - attackRange,this.posY,tileSize,tileSize/2)
 
@@ -797,13 +833,13 @@ class Player {
     }
   }
 
-  hud(){
+  hud(){ // top section of screen
     if (this.alive == true){
-      fill(50,100,50)
+      fill(50,100,50) // dark green
       noStroke()
       rect(0,0,1600,hudSize)
     }
-    this.healthbar()
+    this.healthbar() // displays healthbar
   }
   
   healthbar(){
@@ -820,19 +856,21 @@ class Player {
 
   damageCheck() {
     // player is hit    and   player has not been hit too recently (invincibility frames gone)
-    if ((mouseIsPressed) && (this.damagedRecently == false)){ // if [player is hit by enemy] and player has not been recently damaged
-      this.currentHealth += -25 // take damage // n will be the damage an enemy does
+    if ((this.damagePlayer == true) && (this.damagedRecently == false)){ // if [player is hit by enemy] and player has not been recently damaged
+      this.currentHealth += - 20 // take damage // n will be the damage an enemy does
       this.damagedRecently = true // player has been recently damaged
     }
     if (this.damagedRecently == true){ // if player has been recently damaged
       counter1 += 1 // count increments
     }
-    if (counter1 == 3000){ // n is time being invincible after being hit
+    if (counter1 == this.invincibilityTime * 1000){ // time being invincible after being hit, *1000 to be in seconds
       this.damagedRecently = false // player no longer recently damaged (able to be damaged again)
+      this.damagePlayer = false
       counter1 = 0 // reset invincibility counter
     }
 
     if (this.currentHealth <= 0){ // if player dies
+      this.currentHealth = 0
       this.alive = false
       if (counter2 >= 300){ // once screen is 100% black // 255 is the max for alpha but a slight delay staying on the black screen as the counter continues to go to the higher number before respawning looks nice
         this.currentHealth = this.maxHealth // sets current health to max
@@ -844,8 +882,8 @@ class Player {
         levels[currentLevel].startTileY = spawnTileY
         loadLevel()
 
-        healerDialogue = 2
-        counter2 = 0
+        healerDialogue = 2 // changes healer dialouge to unique dialogue upon respawning in their house
+        counter2 = 0 //resets for next death
       }
     }
   }
@@ -854,7 +892,7 @@ class Player {
     if (this.alive == false){
       fill(0,0,0,counter2)
       rect(0,hudSize,1600,800)
-      counter2 += 0.05
+      counter2 += 0.05 //this low a number as it is used for alpha on the darkness of the death screen. Must be smooth, gradual increase
     }
   }
 
@@ -866,24 +904,140 @@ class Player {
 }
 
 class Enemy {
-  constructor(enemySprite, enemyHp) {
-    this.enemySprite = enemySprite;
-    this.enemyHp = enemyHp;
+  constructor(enemySprite, maxHealth, speed, damage) {
+    this.enemySprite = enemySprite
+    this.maxHealth = maxHealth
+    this.currentHealth = maxHealth
+    this.alive = true
+    this.speed = speed
+    this.damage = damage // damage enemy deals to player
+    this.posX = 0
+    this.posY = 0
+    this.nextPosX = this.posX
+    this.nextPosY = this.posY
+    this.directionChooser = 0 // used for picking random direction, up left down or right
+    this.directionState = down
+    this.enemyMoveTime = 1.5 // time in seconds that an enemy moves in one direction before picking another random direction
+    this.counter4 = 0
+    this.spawned = false
+    this.onMap = false
+
+    this.collidableTiles = 0
+    this.directionOfCollision = 4
+    this.hitboxSize = 40
+    this.collided = false
+    this.damagedRecently = false
   }
 
-  display(tileY_enemy,tileX_enemy) {
+  InitialiseValues(tileY_enemy,tileX_enemy){ //starting values, based on wherever on the tileRules map the enemyTileRulesVal was situated
+    if (this.spawned == false) {
+      this.posX = (tileX_enemy*tileSize) + (tileSize/2)
+      this.posY = (tileY_enemy*tileSize) + (tileSize/2) + hudSize
+      this.spawned = true
+    }
+  }
+
+  display() {
     // Displays the sprite
-    image(this.enemySprite, this.tileX_enemy, this.tileY_enemy, tileSize, tileSize);
-
-    // Displays HP above the slime’s head
-    fill("black");
-    textSize(15);
-    text(
-      this.enemyHp,
-      tileX_enemy*tileSize + (tileSize/2),
-      (tileY_enemy*tileSize) + hudSize - (tileSize/4) // Moves HP above the slime
-    );
+    if (this.alive == true){
+    image(this.enemySprite[this.directionState], this.posX, this.posY, tileSize, tileSize)
+    //this.healthbar()
+    }
   }
+
+  move() {                                                               
+    if (this.alive == true){
+      if (this.counter4 >= this.enemyMoveTime * 1000) {
+        this.directionChooser= random(0,4)
+        this.counter4 = 0
+      }
+      if (this.directionChooser <= 1 && this.directionChooser >= 0){ //UP
+        this.directionState = up
+        this.nextPosY = this.posY - this.speed 
+        this.nextPosX = this.posX // unchanged on x axis
+      }
+      else if (this.directionChooser <= 2 && this.directionChooser >= 1){ //LEFT
+        this.directionState = left
+        this.nextPosX = this.posX - this.speed
+        this.nextPosY = this.posY // unchanged on y axis
+      }
+      else if (this.directionChooser <= 3 && this.directionChooser >= 2){ //DOWN
+        this.directionState = down
+        this.nextPosY = this.posY + this.speed
+        this.nextPosX = this.posX // unchanged on x axis
+      }
+      else if (this.directionChooser <= 4 && this.directionChooser >= 3){ //RIGHT
+        this.directionState = right
+        this.nextPosX = this.posX + this.speed
+        this.nextPosY = this.posY // unchanged on y axis
+      }
+
+      //COLLISION CHECK
+
+      //checking tile collision vv
+      for (let tileX = 0; tileX < tilesX; tileX++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are horizontally
+        for (let tileY = 0; tileY < tilesY; tileY++) { // loops the checks of tiles for things like collisions and level transitions, for how many tiles there are vertically
+
+            tileIsCollidable = false // variable set to false by default before checking the next tile
+
+            for (let i = 0; i < collidableTilesList.length; i++){
+              if (tileRules[tileY][tileX] == collidableTilesList[i]){ // checks if this tile is collidable
+                tileIsCollidable = true // variable set to true if value for tile is collidable
+              }
+            }
+
+            if (tileIsCollidable == true){ // if tile is labelled to have collision
+              collidableTiles += 1 // count of how many collidable tiles there are
+              if ((this.nextPosX >= tileX*tileSize - (this.hitboxSize/2) && this.nextPosX <= tileX*tileSize + (tileSize + (this.hitboxSize/2))) && (this.nextPosY >= tileY*tileSize - (this.hitboxSize/2) + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize + (this.hitboxSize/2)) + (hudSize)) && (this.collided == false)){ // if player is close enough to tile to have collided with it (and a collision has not yet occured with another tile)
+                this.directionOfCollision = this.directionState // (direction of the collided tile compared to the player). direction of collision is set to the direction the player is moving at the time the player collides with the tile
+                this.collided = true // collision is occuring
+                //pushes player back a little when they collide with a tile. This was implemented to fix a bug that allowed the player to enter other collidable tiles if first colliding with another tile perpendicular to it
+                // vv
+                if (this.directionState == up){
+                  this.nextPosY = this.posY + this.speed
+                }
+                if (this.directionState == left){
+                  this.nextPosX = this.posX + this.speed
+                }
+                if (this.directionState == down){
+                  this.nextPosY = this.posY - this.speed
+                }
+                if (this.directionState == right){
+                  this.nextPosX = this.posX - this.speed
+                }
+              }
+              if (!((this.nextPosX >= tileX*tileSize && this.nextPosX <= tileX*tileSize + (tileSize)) && (this.nextPosY >= tileY*tileSize + (hudSize) && this.nextPosY <= tileY*tileSize + (tileSize) + (hudSize)))){ // if player is not close enough to tile to have collided with it
+                collidableTiles_NotCollidedWith += 1 // add one to the count of how many collidable tiles there are that the enemy hasn't collided with
+              }
+            }
+            }
+            }
+            if (collidableTiles_NotCollidedWith == collidableTiles){ // if none of the collidable tiles get collided with by the player:
+            this.collided = false // collision is not occuring
+            this.directionOfCollision = 4 // 4 is the state of no collision occouring in any direction, allowing enemy to walk in all 4 directions
+            }
+            collidableTiles = 0 // resets for next check
+            collidableTiles_NotCollidedWith = 0 // resets for next check
+            if (this.directionOfCollision != this.directionState){ // if attempting to walk in a direction that isn't the direction the collision occured 
+              this.posX = this.nextPosX // move in x direction
+              this.posY = this.nextPosY // move in y direction
+            }
+            this.counter4 ++
+          }
+          }
+
+  healthbar(){
+    //healthbar outline
+    noFill()
+    stroke(0)
+    rect(this.xPos,this.yPos - (tileSize/2),this.maxHealth,20) // healthbar outline
+    fill(200,0,0)
+    noStroke()
+    textSize(30)//scales text size
+    text(this.currentHealth,this.xPos,this.yPos - (tileSize/2))//text display of health
+    rect(this.xPos,this.yPos - (tileSize/2),this.maxHealth/(this.maxHealth/this.currentHealth),20) // healthbar (decreasing part when enemy is damaged)
+  }            //bar length                        //bar thickness
+
 }
 
 
@@ -898,7 +1052,7 @@ class Npc {
 
   display(tileY_NPC,tileX_NPC) {
     // Displays the NPC sprite
-    image(this.NPCSprite, tileX_NPC*tileSize + (tileSize/2), (tileY_NPC*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize);
+    image(this.NPCSprite, tileX_NPC*tileSize + (tileSize/2), (tileY_NPC*tileSize) + (tileSize/2) + hudSize, tileSize, tileSize)
   }
 
   speak(dialogueType,tileY_NPC,tileX_NPC) {
@@ -951,16 +1105,17 @@ function preload() {
     knight_down: [loadImage('sprites/knight_down_still.png'),loadImage('sprites/knight_down_leftlegwalk.png'),loadImage('sprites/knight_down_rightlegwalk.png')],
     knight_right: [loadImage('sprites/knight_right_still.png'),loadImage('sprites/knight_right_leftlegwalk.png'),loadImage('sprites/knight_right_rightlegwalk.png')],
 
-    // group of sprites. Each group containing the sword sprite for a single direction of movement.
-    sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')]
+    // group of sprites. Each group containing the sword sprite for a single direction of attacking.
+    sword: [loadImage('sprites/sword_up_middle.png'),loadImage('sprites/sword_left_middle.png'),loadImage('sprites/sword_down_middle.png'),loadImage('sprites/sword_right_middle.png')],
+
+    // group of sprites. Each group containing the slime sprite for a single direction of movement.
+    blueSlime: [loadImage('sprites/enemy_slime_up.png'),loadImage('sprites/enemy_slime_left.png'),loadImage('sprites/enemy_slime_down.png'),loadImage('sprites/enemy_slime_right.png')]
   }
 
   //Objects
   ladderDown = loadImage("sprites/tile_topper_ladderdown.png")
   ladderUp = loadImage("sprites/tile_topper_ladderup.png")
 
-  //Enemies
-  redSlimeSprite = loadImage("sprites/redSlime.png")
 
   //NPCs
   questgiverNPCSprite = loadImage("sprites/NPC_Questgiver.png")
@@ -979,10 +1134,14 @@ function setup() {
   rectMode(CORNER)
   textAlign(CENTER,CENTER)
 
-  player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize) // instance of Player class
+  player1 = new Player(sprites.knight_down, (spawnTileX*tileSize) + tileSize/2, (spawnTileY*tileSize) + tileSize/2 + hudSize); // instance of Player class
 
-  redSlime = new Enemy(redSlimeSprite, enemyHp);
-                                      // dialogue array // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
+  blueSlime0 = new Enemy(sprites.blueSlime, 50, 0.01, 10); // instances of enemy class
+  blueSlime1 = new Enemy(sprites.blueSlime, 100, 0.01, 10);
+  blueSlime2 = new Enemy(sprites.blueSlime, 100, 0.02, 10);
+  blueSlime3 = new Enemy(sprites.blueSlime, 200, 0.03, 20);
+
+                            // sprite // speed at which npc speech is cycled through, *1000 to make dialogueChangeSpeed be in seconds
   questgiverNPC = new Npc(questgiverNPCSprite, 5); // basic civilian
   healerNPC = new Npc(healerNPCSprite, 6); // healer, in a robe
   guard1NPC = new Npc(guard1NPCSprite, 5); // guard, in a cloak
@@ -995,7 +1154,7 @@ function setup() {
 
 
 
-function loadLevel() {
+function loadLevel() { // loads the graphicMap and tileRules, along with updates player position, when entering a different level
 
   graphicMap = levels[currentLevel].graphicMap
   tileRules = levels[currentLevel].tileRules
@@ -1037,10 +1196,3 @@ function draw() {
 
   //tileMap[5][6].displayMessage()//adding a message to specified tiles
 }
-
-
-
-
-
-
-
