@@ -1,4 +1,3 @@
-#README file
 ---------------------------------------------------------------------------------------------------------
 
 PROJECT NAME: The Vegabond Hero
@@ -13,6 +12,7 @@ LINK TO GITHUB PAGES: [https://jamacusthe3rd.github.io/2506375-2505069-1805-fina
 CONTROLS:
 WASD- Movement
 SPACEBAR- Attack (partially non functioning)
+
 ---------------------------------------------------------------------------------------------------------
 OVERVIEW OF PROJECT
 ---------------------------------------------------------------------------------------------------------
@@ -24,8 +24,8 @@ the game follows themes of fantasy and exploration. It takes inspiration from Th
 INDIVIDUAL CONTRIBUTION
 ---------------------------------------------------------------------------------------------------------
 James Stimpson:
-I did the majority of the coding for this project. I handled the Player's movement and attacking, the creation of Tile Maps, Level Transitions, and the HUD/healthbar. 
-I also heavily developed the NPC and Enemy code, allowing them to work effectively in the main project and be added to levels through the Tile Rules.
+I did most of the coding for this project. I handled the Player's movement and attacking, the creation of Tile Maps, Level Transitions, and the HUD/healthbar. 
+I also heavily developed the base code for NPCs and Enemies, allowing them to work effectively in the main project and be added to levels through the Tile Rules.
 I created the narrative of the villager's struggle, using the dialogue cycle Matthew created to allow the townspeople to speak to the player. 
 This was used to make the town feel welcoming, for the functional purpose of giving info to the player, but also for giving the player a sense of responsibility, to help those who have asked you to save their village.
 I drew all of the sprites used in the final game. The tiles, the player, enemy, and NPCs. 
@@ -33,6 +33,12 @@ I drew all of the sprites used in the final game. The tiles, the player, enemy, 
 ---------------------------------------------------------------------------------------------------------
 THEMES
 ---------------------------------------------------------------------------------------------------------
+Communication of our themes was done early on, ensuring we had an idea set in stone, so that we could effectively work forward from there.
+For our game, we focussed heavily on an upbeat fantasy theme with lots of colour, making it pop.
+The NPCs will be welcoming, full of energy in their speech, and will be safe from harm throughout gameplay.
+The enemies will be colourful, and not look too scary, to keep in with the upbeat theme.
+
+
 Discuss the main themes of your PROJECT and how you approached communicating them through the project. 
 Remember: the module is called 'coding for the arts', so think about how you approached expressing 
 your ideas through the technical aspects of the project!
@@ -40,21 +46,33 @@ your ideas through the technical aspects of the project!
 ---------------------------------------------------------------------------------------------------------
 DESIGN
 ---------------------------------------------------------------------------------------------------------
-Discuss the overall mechanical aspects of the project. Think about how it connects with your themes
-above if you did not already cover it there. You should also discuss how your design was informed by your
-understanding of the technical systems that you were taught in class (and particular those required by
-the assessment brief).
+We planned to use a fan favourite fantasy monster, the Slime, as our enemies. 
+They are incredibly versitile for a game, as they have a simple design, and can vary in colour to create enemies of different strengths, attack types, and movement patterns.
+The use of these monsters fits perfectly with our fantasy theme, and the bright, varying colours of the enemies would make the game pop as intended in the theme.
+Slimes are also an enemy that does not look too scry for the player.
+The use of classes would also make implementing different enemies more straightforward to code.
+
+Our planning for this can be seen in our Miro board, called CFTA Project. https://miro.com/welcomeonboard/K1BSY1J3MHBkSm1vRFBSV05oMDZaNlFISStSQ0c1NTNPYWFhclkyUFU1YTFsaFRwdnd4RmZqVmcxbFUzWGdmcEZJb0lQVmtSeWZiUmU4OUc5TzRxZTVacm95Y3NCSmNtVGZDQTdtTEpKVXVEWmpVSmNNMnpmOUFNOEpLekV0NlpBS2NFMDFkcUNFSnM0d3FEN050ekl3PT0hdjE=?share_link_id=132508916883
 
 ---------------------------------------------------------------------------------------------------------
 AESTHETIC DIMENSIONS
 ---------------------------------------------------------------------------------------------------------
-As a group, how did you ensure parity between the aesthetic, technical and thematic demands of the
-project? Again, think about how your artistic and/or aesthetic choices were informed by your understanding
-of the technical systems of the project.
+To achieve parity for technical aspects of the project, I worked on the main code, and any side code was sent to me by Matthew.
+I would then edit and develop upon the side code to make it work within the main code, then add it.
+As for artistic parity, we labelled specific pixel sizes for tiles, npcs, and enemies, to ensure all was drawn to fit within the same size tile. (32x32pixels drawing, upped to 50x50 in the code)
+Most artwork was done by me only anyway, so differences in artistic styles clashing was not an issue.
+Thematic demands were easy to achieve parity between, as we set our theme and some story ideas early on in the project, and followed from there.
+Overall, we successfully met our aesthetic goal, keeping our work uniform through the use of having one main coder, setting up set values for things like size of art/sprites, and early communication
 
 ---------------------------------------------------------------------------------------------------------
 UNREALISED ASPECTS OF PROJECT
 ---------------------------------------------------------------------------------------------------------
+I speak about, in the setbacks section, what we had to cut out of the game during our coding process. 
+However thare are also many aspects we had in our early plan that we would have liked to include, along with a few others thought of while making the game.
+
+Sound effects/music. Sound really helps for player engagement. It can help to make a game fun, through a ding noise when the player does something successfully, like kill an enemy or find an object.
+
+
 Discuss here any aspects of the project you would have included if you had more time. Think about technical
 issues you had and how you might go about trying to fix them (or how you'd start the research process) if
 time and scope allowed. What other mechanics or ideas would you have implemented with more time? How would you
