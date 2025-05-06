@@ -15,14 +15,14 @@ WASD- Movement
 SPACEBAR- Attack (partially non functioning)
 ---------------------------------------------------------------------------------------------------------
 OVERVIEW OF PROJECT
-
+---------------------------------------------------------------------------------------------------------
 This project is an action-adventure game, where you play as a wandering warrior, making their living through completing tasks for people.
 This project uses tiles to make it's levels. However unlike most games using tiles for the landscape, this has the notable feature of free movement, not being restricted to clunky tile-based movement.
 the game follows themes of fantasy and exploration. It takes inspiration from The Legend of Zelda (1986).
 
-
+---------------------------------------------------------------------------------------------------------
 INDIVIDUAL CONTRIBUTION
-
+---------------------------------------------------------------------------------------------------------
 James Stimpson:
 I did the majority of the coding for this project. I handled the Player's movement and attacking, the creation of Tile Maps, Level Transitions, and the HUD/healthbar. 
 I also heavily developed the NPC and Enemy code, allowing them to work effectively in the main project and be added to levels through the Tile Rules.
@@ -30,24 +30,31 @@ I created the narrative of the villager's struggle, using the dialogue cycle Mat
 This was used to make the town feel welcoming, for the functional purpose of giving info to the player, but also for giving the player a sense of responsibility, to help those who have asked you to save their village.
 I drew all of the sprites used in the final game. The tiles, the player, enemy, and NPCs. 
 
-
+---------------------------------------------------------------------------------------------------------
 THEMES
+---------------------------------------------------------------------------------------------------------
 Discuss the main themes of your PROJECT and how you approached communicating them through the project. 
 Remember: the module is called 'coding for the arts', so think about how you approached expressing 
 your ideas through the technical aspects of the project!
 
+---------------------------------------------------------------------------------------------------------
 DESIGN
+---------------------------------------------------------------------------------------------------------
 Discuss the overall mechanical aspects of the project. Think about how it connects with your themes
 above if you did not already cover it there. You should also discuss how your design was informed by your
 understanding of the technical systems that you were taught in class (and particular those required by
 the assessment brief).
 
+---------------------------------------------------------------------------------------------------------
 AESTHETIC DIMENSIONS
+---------------------------------------------------------------------------------------------------------
 As a group, how did you ensure parity between the aesthetic, technical and thematic demands of the
 project? Again, think about how your artistic and/or aesthetic choices were informed by your understanding
 of the technical systems of the project.
 
+---------------------------------------------------------------------------------------------------------
 UNREALISED ASPECTS OF PROJECT
+---------------------------------------------------------------------------------------------------------
 Discuss here any aspects of the project you would have included if you had more time. Think about technical
 issues you had and how you might go about trying to fix them (or how you'd start the research process) if
 time and scope allowed. What other mechanics or ideas would you have implemented with more time? How would you
@@ -56,7 +63,9 @@ have gone about implementing these?
 You may include more titles and text if you desire beyond the above titles if you want. Put them here at the bottom.
 You may, for instance, want to include a narrative section if story is particularly important to your project.
 
+---------------------------------------------------------------------------------------------------------
 SETBACKS AND HOW THEY WERE OVERCOME
+---------------------------------------------------------------------------------------------------------
 
 One large setback in this project was Matthew explaining that he would be unable to meet his goals for the project, due to personal reasons. He showed resourcefulness in letting me know, as it gave us time to come up with a solution.
 In the workplace, people can be off sick, or not in work for many reasons, but the work has to continue, on schedule. So I picked up most of the workload he was unable to complete, which I believe shows initiative, good teamworking, and managing group dynamics effectively. Along with supporting the progress of the project so deadlines in the workplace are met.
