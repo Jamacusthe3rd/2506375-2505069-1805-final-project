@@ -33,7 +33,7 @@ I drew all of the sprites used in the final game. The tiles, the player, enemy, 
 
 Matthew Hands:
 
-<h6>For this project i have attempted to code an object-class inherit system using repeating values for enemies and npcs, i would be able to shorten the code down and make it simpler to understand. I've designed and added the pixel art for the sprites that will differentiate the sprites from each other. I have added a dialogue timer that will cycle between an array of possible text to display above the npcs head after a certain time has been met, it will then pause for the same amount of time before displaying a new piece of text from the array.</h6>
+<h4>For this project i have attempted to code an object-class inherit system using repeating values for enemies and npcs, i would be able to shorten the code down and make it simpler to understand. I've designed and added the pixel art for the sprites that will differentiate the sprites from each other. I have added a dialogue timer that will cycle between an array of possible text to display above the npcs head after a certain time has been met, it will then pause for the same amount of time before displaying a new piece of text from the array.</h4>
 ---------------------------------------------------------------------------------------------------------
 THEMES
 ---------------------------------------------------------------------------------------------------------
