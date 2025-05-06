@@ -38,11 +38,6 @@ For our game, we focussed heavily on an upbeat fantasy theme with lots of colour
 The NPCs will be welcoming, full of energy in their speech, and will be safe from harm throughout gameplay.
 The enemies will be colourful, and not look too scary, to keep in with the upbeat theme.
 
-
-Discuss the main themes of your PROJECT and how you approached communicating them through the project. 
-Remember: the module is called 'coding for the arts', so think about how you approached expressing 
-your ideas through the technical aspects of the project!
-
 ---------------------------------------------------------------------------------------------------------
 DESIGN
 ---------------------------------------------------------------------------------------------------------
@@ -68,18 +63,22 @@ Overall, we successfully met our aesthetic goal, keeping our work uniform throug
 UNREALISED ASPECTS OF PROJECT
 ---------------------------------------------------------------------------------------------------------
 I speak about, in the setbacks section, what we had to cut out of the game during our coding process. 
-However thare are also many aspects we had in our early plan that we would have liked to include, along with a few others thought of while making the game.
+However there are also many aspects we had in our early plan that we would have liked to include, along with a few others, thought of while making the game.
 
-Sound effects/music. Sound really helps for player engagement. It can help to make a game fun, through a ding noise when the player does something successfully, like kill an enemy or find an object.
+Attacking the enemies. This is something that needs to be added to make the game function as intended. 
 
+display of enemies' health. will help the player to know how strong the opponent is.
 
-Discuss here any aspects of the project you would have included if you had more time. Think about technical
-issues you had and how you might go about trying to fix them (or how you'd start the research process) if
-time and scope allowed. What other mechanics or ideas would you have implemented with more time? How would you
-have gone about implementing these?
+Sound effects/music. Sound really helps for player engagement. 
+It can also help to make a game fun, through things like a ding noise when the player does something successfully, like kill an enemy or find an object.
 
-You may include more titles and text if you desire beyond the above titles if you want. Put them here at the bottom.
-You may, for instance, want to include a narrative section if story is particularly important to your project.
+Magic attacks. These spells would use up bars of mana, displayed in the HUD with the healthbar. 
+Would allow player to learn new spells as quest rewards. Some spells could be fireball, call lightning, and protection.
+
+Heart crystals. Inspired by Terraria (2011), these items would permanently increase the player's max health.
+These would be placed in a few secret areas, (such as the hidden room behind the far right house) and could also act as a quest reward.
+
+Coin and shop system. Player collects coins from dead enemies, which can buy items and stronger weapons/armour.
 
 ---------------------------------------------------------------------------------------------------------
 SETBACKS AND HOW THEY WERE OVERCOME
