@@ -55,15 +55,15 @@ AESTHETIC DIMENSIONS
 To achieve parity for technical aspects of the project, I worked on the main code, and any side code was sent to me by Matthew.
 I would then edit and develop upon the side code to make it work within the main code, then add it.
 As for artistic parity, we labelled specific pixel sizes for tiles, npcs, and enemies, to ensure all was drawn to fit within the same size tile. (32x32pixels drawing, upped to 50x50 in the code)
-Most artwork was done by me only anyway, so differences in artistic styles clashing was not an issue.
-Thematic demands were easy to achieve parity between, as we set our theme and some story ideas early on in the project, and followed from there.
+Most artwork was done by me only, so differences in artistic styles clashing was not an issue.
+Thematic demands were easy to achieve parity between, as we set our theme and some initial story ideas early on in the project, and followed from there.
 Overall, we successfully met our aesthetic goal, keeping our work uniform through the use of having one main coder, setting up set values for things like size of art/sprites, and early communication
 
 ---------------------------------------------------------------------------------------------------------
 UNREALISED ASPECTS OF PROJECT
 ---------------------------------------------------------------------------------------------------------
-I speak about, in the setbacks section, what we had to cut out of the game during our coding process. 
-However there are also many aspects we had in our early plan that we would have liked to include, along with a few others, thought of while making the game.
+In the setbacks section, I spoke about what we had to cut out of the game during our coding process. 
+However, there are also many aspects we had in our early plan that we would have liked to include, along with a few others, thought of while making the game.
 
 Attacking the enemies. This is something that needs to be added to make the game function as intended. 
 
